@@ -26,6 +26,7 @@ public class Main {
       // ensures that we don't run into 'Address already in use' errors
       serverSocket.setReuseAddress(true);
       while (true) {
+System.out.println("main waiting for clients");
         // Wait for connection from client.
         Socket clientSocket = serverSocket.accept();
         executorService.submit(() -> handleRequest(clientSocket));
@@ -42,8 +43,8 @@ public class Main {
   }
 
   private static void handleRequest(Socket clientSocket) {
-    try (clientSocket) {
 System.out.println("handleRequest");
+    try (clientSocket) {
       InputStream in = clientSocket.getInputStream();
       byte[] messageSizeBytes = in.readNBytes(4);
       byte[] requestApiKeyBytes = in.readNBytes(2);
@@ -83,6 +84,9 @@ System.out.println("handleRequest messageSize=" + messageSize);
       out.write(payload.toByteArray());
       out.flush();
     } catch (IOException e) {
+      System.err.println(e.getMessage());
+      e.printStackTrace();
+    } catch (Exception e) {
       System.err.println(e.getMessage());
       e.printStackTrace();
     }
