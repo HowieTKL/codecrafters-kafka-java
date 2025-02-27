@@ -1,3 +1,4 @@
+import javax.sound.sampled.Port;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -5,42 +6,38 @@ import java.io.OutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.nio.ByteBuffer;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class Main {
+  private static final int PORT = 9092;
+  private static final int THREADS = 4;
   private static final byte[] ERR_UNSUPPORTED_VERSION = new byte[]{0, 35};
   private static final byte[] ERR_NONE = new byte[]{0, 0};
   private static final byte[] API_KEY_API_VERSIONS = new byte[]{0, 18};
+
   public static void main(String[] args) {
     // You can use print statements as follows for debugging, they'll be visible when running tests.
     System.err.println("Logs from your program will appear here!");
 
-    ServerSocket serverSocket = null;
-    Socket clientSocket = null;
-    int port = 9092;
-    try {
-      serverSocket = new ServerSocket(port);
+    ExecutorService executorService = Executors.newFixedThreadPool(THREADS);
+    try (ServerSocket serverSocket = new ServerSocket(PORT)) {
       // Since the tester restarts your program quite often, setting SO_REUSEADDR
       // ensures that we don't run into 'Address already in use' errors
       serverSocket.setReuseAddress(true);
       while (true) {
         // Wait for connection from client.
-        clientSocket = serverSocket.accept();
-        handleRequest(clientSocket);
+        Socket clientSocket = serverSocket.accept();
+        executorService.submit(() -> handleRequest(clientSocket));
       }
     } catch (IOException e) {
-      System.out.println("IOException: " + e.getMessage());
+      e.printStackTrace();
     } finally {
-      try {
-        if (clientSocket != null) {
-          clientSocket.close();
-        }
-      } catch (IOException e) {
-        System.out.println("IOException: " + e.getMessage());
-      }
+      executorService.close();
     }
   }
 
-  private static void handleRequest(Socket clientSocket) throws IOException {
+  private static void handleRequest(Socket clientSocket) {
     try (clientSocket) {
       InputStream in = clientSocket.getInputStream();
       byte[] messageSizeBytes = in.readNBytes(4);
@@ -77,6 +74,9 @@ public class Main {
       out.write(ByteBuffer.allocate(4).putInt(payload.size()).array()); // message/payload size
       out.write(payload.toByteArray());
       out.flush();
+    } catch (IOException e) {
+      e.printStackTrace();
     }
   }
+
 }
