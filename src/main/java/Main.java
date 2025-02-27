@@ -9,7 +9,7 @@ import java.nio.ByteBuffer;
 public class Main {
   private static final byte[] ERR_UNSUPPORTED_VERSION = new byte[]{0, 35};
   private static final byte[] ERR_NONE = new byte[]{0, 0};
-  private static final byte[] API_KEY_API_VERSIONS = new byte[]{0, 0, 0, 18};
+  private static final byte[] API_KEY_API_VERSIONS = new byte[]{0, 18};
   public static void main(String[] args) {
     // You can use print statements as follows for debugging, they'll be visible when running tests.
     System.err.println("Logs from your program will appear here!");
