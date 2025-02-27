@@ -15,6 +15,7 @@ public class Main {
   private static final byte[] ERR_UNSUPPORTED_VERSION = new byte[]{0, 35};
   private static final byte[] ERR_NONE = new byte[]{0, 0};
   private static final byte[] API_KEY_API_VERSIONS = new byte[]{0, 18};
+  private static final byte[] API_KEY_DESCRIBE_TOPIC_PARTITIONS = new byte[]{0, 75};
 
   public static void main(String[] args) {
     // You can use print statements as follows for debugging, they'll be visible when running tests.
@@ -75,11 +76,14 @@ System.out.println("handleRequest");
         } else {
           System.out.println("handleRequest ERR_NONE");
           payload.write(ERR_NONE);
-          payload.write(2);
+          payload.write(3);
           payload.write(API_KEY_API_VERSIONS);
           payload.write(new byte[]{0, 0}); // min version
           payload.write(new byte[]{0, 4}); // max version
           payload.write(0); // tagged field
+          payload.write(API_KEY_DESCRIBE_TOPIC_PARTITIONS);
+          payload.write(new byte[]{0, 0}); // min version
+          payload.write(new byte[]{0, 0}); // max version
           payload.write(new byte[]{0, 0, 0, 0}); // throttle time
           payload.write(0); // tagged field
         }
