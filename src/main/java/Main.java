@@ -11,7 +11,7 @@ import java.util.concurrent.Executors;
 
 public class Main {
   private static final int PORT = 9092;
-  private static final int THREADS = 4;
+  private static final int THREADS = 8;
   private static final byte[] ERR_UNSUPPORTED_VERSION = new byte[]{0, 35};
   private static final byte[] ERR_NONE = new byte[]{0, 0};
   private static final byte[] API_KEY_API_VERSIONS = new byte[]{0, 18};
@@ -40,6 +40,7 @@ System.out.println("main waiting for clients");
     } finally {
       executorService.close();
     }
+    System.out.println("main system down");
   }
 
   private static void handleRequest(Socket clientSocket) {
@@ -69,7 +70,9 @@ System.out.println("handleRequest messageSize=" + messageSize);
       short requestApiVersion = ByteBuffer.wrap(requestApiVersionBytes).getShort();
       if (requestApiVersion < 0 || requestApiVersion > 4) {
         payload.write(ERR_UNSUPPORTED_VERSION);
+System.out.println("handleRequest ERR_UNSUPPORTED_VERSION");
       } else {
+System.out.println("handleRequest ERR_NONE");
         payload.write(ERR_NONE);
         payload.write(2);
         payload.write(API_KEY_API_VERSIONS);
@@ -83,6 +86,7 @@ System.out.println("handleRequest messageSize=" + messageSize);
       out.write(ByteBuffer.allocate(messageSizeBytes.length).putInt(payload.size()).array()); // message/payload size
       out.write(payload.toByteArray());
       out.flush();
+System.out.println("handleRequest flushed response");
     } catch (IOException e) {
       System.err.println(e.getMessage());
       e.printStackTrace();
