@@ -64,14 +64,14 @@ public class Main {
         payload.write(ERR_NONE);
         payload.write(2);
         payload.write(API_KEY_API_VERSIONS);
-        payload.write(new byte[]{0, 3}); // min version
+        payload.write(new byte[]{0, 0}); // min version
         payload.write(new byte[]{0, 4}); // max version
         payload.write(0); // tagged field
         payload.write(new byte[]{0, 0, 0, 0}); // throttle time
         payload.write(0); // tagged field
       }
       OutputStream out = clientSocket.getOutputStream();
-      out.write(ByteBuffer.allocate(4).putInt(payload.size()).array()); // message/payload size
+      out.write(ByteBuffer.allocate(messageSizeBytes.length).putInt(payload.size()).array()); // message/payload size
       out.write(payload.toByteArray());
       out.flush();
     } catch (IOException e) {
