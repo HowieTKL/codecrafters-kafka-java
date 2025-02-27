@@ -31,6 +31,10 @@ public class Main {
         executorService.submit(() -> handleRequest(clientSocket));
       }
     } catch (IOException e) {
+      System.err.println(e.getMessage());
+      e.printStackTrace();
+    } catch (Exception e) {
+      System.err.println(e.getMessage());
       e.printStackTrace();
     } finally {
       executorService.close();
@@ -79,6 +83,7 @@ System.out.println("handleRequest messageSize=" + messageSize);
       out.write(payload.toByteArray());
       out.flush();
     } catch (IOException e) {
+      System.err.println(e.getMessage());
       e.printStackTrace();
     }
   }
