@@ -84,6 +84,7 @@ System.out.println("handleRequest");
           payload.write(API_KEY_DESCRIBE_TOPIC_PARTITIONS);
           payload.write(new byte[]{0, 0}); // min version
           payload.write(new byte[]{0, 0}); // max version
+          payload.write(0); // tagged field
           payload.write(new byte[]{0, 0, 0, 0}); // throttle time
           payload.write(0); // tagged field
         }
