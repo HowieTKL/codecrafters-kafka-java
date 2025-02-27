@@ -39,11 +39,15 @@ public class Main {
 
   private static void handleRequest(Socket clientSocket) {
     try (clientSocket) {
+System.out.println("handleRequest");
       InputStream in = clientSocket.getInputStream();
       byte[] messageSizeBytes = in.readNBytes(4);
       byte[] requestApiKeyBytes = in.readNBytes(2);
       byte[] requestApiVersionBytes = in.readNBytes(2);
       byte[] correlationId = in.readNBytes(4);
+      int messageSize = ByteBuffer.wrap(messageSizeBytes).getInt();
+      in.skipNBytes(messageSize - 8);
+System.out.println("handleRequest messageSize=" + messageSize);
   /*
   message_size => INT32
   correlation_id => INT32
