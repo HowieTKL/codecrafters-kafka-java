@@ -56,7 +56,7 @@ public class Main {
   static void handleRequest(Socket clientSocket) {
     System.out.println("handleRequest");
     try (clientSocket) {
-      while (!clientSocket.isClosed()) {
+      while (!clientSocket.isClosed() && clientSocket.getInputStream().available() > 4) {
         InputStream in = clientSocket.getInputStream();
         int messageSize = ByteBuffer.wrap(in.readNBytes(4)).getInt();
         System.out.println("handleRequest messageSize=" + messageSize);

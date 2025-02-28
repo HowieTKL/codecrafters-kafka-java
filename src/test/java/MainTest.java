@@ -39,7 +39,4 @@ class MainTest {
     resBuffer.getInt();// correlationId
     assertEquals(ByteBuffer.wrap(Main.ERR_UNSUPPORTED_VERSION).getShort(), resBuffer.getShort());
   }
-
-
-
-}
+ }
