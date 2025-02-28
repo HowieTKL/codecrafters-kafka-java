@@ -50,7 +50,7 @@ public class Main {
     } finally {
       executorService.close();
     }
-    System.out.println("main system down");
+    System.out.println("main system terminated");
   }
 
   static void handleRequest(Socket clientSocket) {
@@ -100,12 +100,12 @@ public class Main {
   static void handleApiVersions(ByteBuffer reqPayload, ByteArrayOutputStream resPayload) throws IOException {
     System.out.println("handleRequest API_KEY_API_VERSIONS");
     resPayload.write(ERR_NONE);
-    resPayload.write(3);
-    resPayload.write(API_KEY_API_VERSIONS);
+    resPayload.write(3); // num_api_keys + 1
+    resPayload.write(ByteBuffer.allocate(2).putShort(API_KEY_API_VERSIONS).array());
     resPayload.write(new byte[]{0, 0}); // min version
     resPayload.write(new byte[]{0, 4}); // max version
     resPayload.write(0); // tag buffer
-    resPayload.write(API_KEY_DESCRIBE_TOPIC_PARTITIONS);
+    resPayload.write(ByteBuffer.allocate(2).putShort(API_KEY_DESCRIBE_TOPIC_PARTITIONS).array());
     resPayload.write(new byte[]{0, 0}); // min version
     resPayload.write(new byte[]{0, 0}); // max version
     resPayload.write(0); // tag buffer
