@@ -124,7 +124,7 @@ public class Main {
     resPayload.write(0); // throttle time
     resPayload.write(new byte[]{2}); // array length
     resPayload.write(ERR_UNKNOWN_TOPIC_OR_PARTITION);
-    resPayload.write(new byte[]{(byte)topicName.length()}); // topic name size
+    resPayload.write(new byte[]{(byte)(topicName.length() + 1)}); // topic name size
     resPayload.write(topicName.getBytes(StandardCharsets.UTF_8));
     resPayload.write(new byte[16]); // topic id
     resPayload.write(new byte[]{0}); // is internal
