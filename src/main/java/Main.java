@@ -121,7 +121,7 @@ public class Main {
     reqPayload.get(); // cursor
     reqPayload.get(); // tag buffer
     resPayload.write(new byte[]{0}); // tag buffer
-    resPayload.write(0); // throttle time
+    resPayload.write(new byte[]{0,0,0,0}); // throttle time
     resPayload.write(new byte[]{2}); // array length
     resPayload.write(ERR_UNKNOWN_TOPIC_OR_PARTITION);
     resPayload.write(new byte[]{(byte)(topicName.length() + 1)}); // topic name size
