@@ -5,6 +5,7 @@ import java.io.OutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.nio.ByteBuffer;
+import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -113,12 +114,21 @@ public class Main {
 
     // for each topic
     for (int i = 0; i < request.topicNames.size(); i++) {
-      byte[] topicUUID = Metadata.getInstance().findTopicUUID(request.topicNames.get(i));
+      String topicName = request.topicNames.get(i);
+      byte[] topicUUID = Metadata.getInstance().findTopicUUID(topicName);
       if (topicUUID != null) {
         resPayload.write(ERR_NONE);
-        Utils.putCompactString(resPayload, request.topicNames.get(i));
+        Utils.putCompactString(resPayload, topicName);
         resPayload.write(topicUUID); // topic id
         resPayload.write(new byte[]{0}); // is internal
+        List<PartitionRecordValue> partitions = Metadata.getInstance().findPartitionRecordValues(topicUUID);
+        Utils.putUnsignedVarInt(resPayload, partitions.size() + 1);
+        for (PartitionRecordValue partition : partitions) {
+          resPayload.write(ERR_NONE);
+          resPayload.write(partition.partitionId);
+          // TODO
+          resPayload.write(new byte[]{0}); // tag buffer
+        }
         resPayload.write(new byte[]{1}); // partitions array TODO
         resPayload.write(new byte[]{0, 0, 0xD, (byte) 0xF8}); // topic authorized operations
         resPayload.write(new byte[]{0}); // tag buffer

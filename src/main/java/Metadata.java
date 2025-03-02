@@ -147,7 +147,7 @@ System.out.println("record value type: " + type);
     PartitionRecordValue recordValue = new PartitionRecordValue();
     recordValue.version = src.get();
     src.get(recordValue.partitionId);
-    System.out.println("    partitionId:" + recordValue.partitionId);
+    System.out.println("    partitionId:" + Utils.bytesToHex(recordValue.partitionId));
     src.get(recordValue.topicUUID);
     System.out.println("    topicUUID:" + Utils.bytesToHex(recordValue.topicUUID));
     // todo
