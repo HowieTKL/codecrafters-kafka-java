@@ -15,6 +15,7 @@ public class Main {
 
   static final String KAFKA_CLUSTER_METADATA_LOG_PATH = "/tmp/kraft-combined-logs/__cluster_metadata-0/00000000000000000000.log";
 
+  static final short API_KEY_FETCH = 1;
   static final short API_KEY_API_VERSIONS = 18;
   static final short API_KEY_DESCRIBE_TOPIC_PARTITIONS = 75;
 
@@ -91,7 +92,7 @@ public class Main {
   static void handleApiVersions(ApiVersionsRequest  request, ByteArrayOutputStream resPayload) throws IOException {
     System.out.println("handleRequest API_KEY_API_VERSIONS");
     resPayload.write(ERR_NONE);
-    resPayload.write(3); // num_api_keys + 1
+    resPayload.write(4); // num_api_keys + 1
     resPayload.write(ByteBuffer.allocate(2).putShort(API_KEY_API_VERSIONS).array());
     resPayload.write(new byte[]{0, 0}); // min version
     resPayload.write(new byte[]{0, 4}); // max version
@@ -99,6 +100,10 @@ public class Main {
     resPayload.write(ByteBuffer.allocate(2).putShort(API_KEY_DESCRIBE_TOPIC_PARTITIONS).array());
     resPayload.write(new byte[]{0, 0}); // min version
     resPayload.write(new byte[]{0, 0}); // max version
+    resPayload.write(0); // tag buffer
+    resPayload.write(ByteBuffer.allocate(2).putShort(API_KEY_FETCH).array());
+    resPayload.write(new byte[]{0, 0}); // min version
+    resPayload.write(new byte[]{0, 16}); // max version
     resPayload.write(0); // tag buffer
     resPayload.write(new byte[]{0, 0, 0, 0}); // throttle time
     resPayload.write(0); // tag buffer
