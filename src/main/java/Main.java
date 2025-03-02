@@ -109,9 +109,9 @@ public class Main {
     resPayload.write(new byte[]{0}); // tag buffer
     resPayload.write(new byte[]{0,0,0,0}); // throttle time
 
+    System.out.println(" topics=" + request.topicNames.toString());
     // topics
     Utils.putUnsignedVarInt(resPayload, request.topicNames.size() + 1); // compact array size
-
     // for each topic
     for (int i = 0; i < request.topicNames.size(); i++) {
       String topicName = request.topicNames.get(i);
