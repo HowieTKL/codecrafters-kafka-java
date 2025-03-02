@@ -22,6 +22,16 @@ class Metadata {
   }
 
   byte[] findTopicUUID(String topicName) {
+    for (RecordBatch recordBatch : recordBatches) {
+      for (Record record : recordBatch.records) {
+        if (record.recordValue.getType() == TopicRecordValue.TYPE) {
+          TopicRecordValue topicRecordValue = (TopicRecordValue) record.recordValue;
+          if (topicRecordValue.topicName.equals(topicName)) {
+            return topicRecordValue.topicUUID;
+          }
+        }
+      }
+    }
     return null;
   }
 
@@ -105,21 +115,25 @@ System.out.println("record value type: " + type);
   }
 
   static TopicRecordValue getTopicRecordValue(ByteBuffer src) throws IOException {
-    System.out.println("Parsing TopicRecordValue");
+    System.out.println("   TopicRecordValue");
     TopicRecordValue recordValue = new TopicRecordValue();
-    // todo
+    recordValue.version = src.get();
+    recordValue.topicName = Utils.getCompactString(src);
+    System.out.println("   record value topic name:" + recordValue.topicName);
+    src.get(recordValue.topicUUID);
+    recordValue.taggedFieldsCount = Utils.getUnsignedVarInt(src);
     return recordValue;
   }
 
   static PartitionRecordValue getPartitionRecordValue(ByteBuffer src) throws IOException {
-    System.out.println("Parsing PartitionRecordValue");
+    System.out.println("   PartitionRecordValue");
     PartitionRecordValue recordValue = new PartitionRecordValue();
     // todo
     return recordValue;
   }
 
   static FeatureLevelRecordValue getFeatureLevelRecordValue(ByteBuffer src) throws IOException {
-    System.out.println("Parsing FeatureLevelRecordValue");
+    System.out.println("   FeatureLevelRecordValue");
     FeatureLevelRecordValue recordValue = new FeatureLevelRecordValue();
     // todo
     return recordValue;

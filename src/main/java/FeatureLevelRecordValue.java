@@ -8,4 +8,8 @@ public class FeatureLevelRecordValue extends RecordValue {
    */
   static final byte TYPE = 0x0c; // 12
 
+  @Override
+  byte getType() {
+    return TYPE;
+  }
 }

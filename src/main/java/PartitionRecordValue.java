@@ -18,4 +18,9 @@ public class PartitionRecordValue extends RecordValue {
    */
   static final byte TYPE = 0x3; // 3
 
+  @Override
+  byte getType() {
+    return TYPE;
+  }
+
 }

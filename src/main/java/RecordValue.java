@@ -7,4 +7,6 @@ public abstract class RecordValue {
    */
   byte frameVersion;
   byte version;
+
+  abstract byte getType();
 }
