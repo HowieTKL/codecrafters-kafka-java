@@ -42,6 +42,7 @@ class Metadata {
     System.out.println("Parsing record batch");
     RecordBatch recBatch = new RecordBatch();
     src.get(recBatch.baseOffset);
+    System.out.println("Base offset: " + ByteBuffer.wrap(recBatch.baseOffset).getLong());
     src.get(recBatch.batchLength);
     src.get(recBatch.partitionLeaderEpoch);
     recBatch.magicByte = src.get();
@@ -71,6 +72,7 @@ class Metadata {
     System.out.println("Parsing record");
     Record record = new Record();
     record.length = Utils.getSignedVarInt(src);
+    System.out.println("record length: " + record.length);
     record.attributes = src.get(); // attributes (unused)
     record.timestamp = Utils.getSignedVarInt(src);
     record.offset = Utils.getSignedVarInt(src);
@@ -80,6 +82,7 @@ class Metadata {
       src.get(record.key);
     }
     record.valueLength = Utils.getSignedVarInt(src);
+    System.out.println("record value length: " + record.valueLength);
     if (record.valueLength > 0) {
       byte[] recordValueBytes = new byte[record.valueLength];
       src.get(recordValueBytes);
@@ -91,10 +94,12 @@ System.out.println("record value type: " + type);
         case TopicRecordValue.TYPE -> record.recordValue = getTopicRecordValue(rvSrc);
         case PartitionRecordValue.TYPE -> record.recordValue = getPartitionRecordValue(rvSrc);
         case FeatureLevelRecordValue.TYPE -> record.recordValue = getFeatureLevelRecordValue(rvSrc);
-        default -> throw new IllegalStateException("Unexpected record type: " + type);
+        default -> System.out.println("Unexpected record value type: " + type);
       }
-      record.recordValue.frameVersion = frameVersion;
-      record.headersArrayCount = Utils.getUnsignedVarInt(src);
+      if (record.recordValue != null) {
+        record.recordValue.frameVersion = frameVersion;
+        record.headersArrayCount = Utils.getUnsignedVarInt(src);
+      }
     }
     return record;
   }
