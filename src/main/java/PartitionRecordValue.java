@@ -24,11 +24,11 @@ public class PartitionRecordValue extends RecordValue {
   byte[] topicUUID = new byte[16];
   List<byte[]> replicaArray = new ArrayList<>(); // 4-bytes each
   List<byte[]> inSyncReplicaArray = new ArrayList<>(); // 4-bytes each
-  int RemovingReplicasArrayLength; // varint unsigned
-  int addingReplicasArrayLength; // varint unsigned
-  int leader; // 4-bytes
-  int leaderEpoch; // 4-bytes
-  int partitionEpoch; // 4-bytes
+  List<byte[]> removingReplicasArray = new ArrayList<>(); // 4-bytes each
+  List<byte[]> addingReplicasArray = new ArrayList<>(); // 4-bytes each
+  byte[] leader = new byte[4]; // 4-bytes
+  byte[] leaderEpoch = new byte[4]; // 4-bytes
+  byte[] partitionEpoch = new byte[4]; // 4-bytes
   List<byte[]> directoriesArray = new ArrayList<>(); // 16-bytes directory UUIDs
   int taggedFieldsCount; // varint unsigned
 

@@ -126,10 +126,21 @@ public class Main {
         for (PartitionRecordValue partition : partitions) {
           resPayload.write(ERR_NONE);
           resPayload.write(partition.partitionId);
-          // TODO
+          resPayload.write(partition.leader);
+          resPayload.write(partition.leaderEpoch);
+          Utils.putUnsignedVarInt(resPayload, partition.replicaArray.size() + 1);
+          for (byte[] replica: partition.replicaArray) {
+            resPayload.write(replica);
+          }
+          Utils.putUnsignedVarInt(resPayload, partition.inSyncReplicaArray.size() + 1);
+          for (byte[] inSyncReplica: partition.inSyncReplicaArray) {
+            resPayload.write(inSyncReplica);
+          }
+          resPayload.write(new byte[]{1}); // eligible leader replicas
+          resPayload.write(new byte[]{1}); // last known eligible leader replicas
+          resPayload.write(new byte[]{1}); // last known offline replicas
           resPayload.write(new byte[]{0}); // tag buffer
         }
-        resPayload.write(new byte[]{1}); // partitions array TODO
         resPayload.write(new byte[]{0, 0, 0xD, (byte) 0xF8}); // topic authorized operations
         resPayload.write(new byte[]{0}); // tag buffer
       } else {

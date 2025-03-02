@@ -150,7 +150,50 @@ System.out.println("record value type: " + type);
     System.out.println("    partitionId:" + Utils.bytesToHex(recordValue.partitionId));
     src.get(recordValue.topicUUID);
     System.out.println("    topicUUID:" + Utils.bytesToHex(recordValue.topicUUID));
-    // todo
+    {
+      int replicaArrayLength = Utils.getUnsignedVarInt(src) - 1;
+      for (int i = 0; i < replicaArrayLength; i++) {
+        byte[] replicaArray = new byte[4];
+        src.get(replicaArray);
+        recordValue.replicaArray.add(replicaArray);
+      }
+    }
+    {
+      int inSyncReplicaArrayLength = Utils.getUnsignedVarInt(src) - 1;
+      for (int i = 0; i < inSyncReplicaArrayLength; i++) {
+        byte[] inSyncReplicaArray = new byte[4];
+        src.get(inSyncReplicaArray);
+        recordValue.inSyncReplicaArray.add(inSyncReplicaArray);
+      }
+    }
+    {
+      int removingReplicasArrayLength = Utils.getUnsignedVarInt(src) - 1;
+      for (int i = 0; i < removingReplicasArrayLength; i++) {
+        byte[] removingReplicasArray = new byte[4];
+        src.get(removingReplicasArray);
+        recordValue.removingReplicasArray.add(removingReplicasArray);
+      }
+    }
+    {
+      int addingReplicasArrayLength = Utils.getUnsignedVarInt(src) - 1;
+      for (int i = 0; i < addingReplicasArrayLength; i++) {
+        byte[] addingReplicasArray = new byte[4];
+        src.get(addingReplicasArray);
+        recordValue.addingReplicasArray.add(addingReplicasArray);
+      }
+    }
+    src.get(recordValue.leader);
+    src.get(recordValue.leaderEpoch);
+    src.get(recordValue.partitionEpoch);
+    {
+      int directoriesArrayLength = Utils.getUnsignedVarInt(src) - 1;
+      for (int i = 0; i < directoriesArrayLength; i++) {
+        byte[] directoriesArray = new byte[16];
+        src.get(directoriesArray);
+        recordValue.directoriesArray.add(directoriesArray);
+      }
+    }
+    recordValue.taggedFieldsCount = Utils.getUnsignedVarInt(src);
     return recordValue;
   }
 
