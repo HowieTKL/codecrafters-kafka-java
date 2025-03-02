@@ -9,6 +9,7 @@ public class DescribeTopicPartitionsRequest extends Request {
 
   @Override
   void parseRequest(ByteBuffer src) throws IOException {
+    System.out.println("parsing DescribeTopicPartitionsRequest");
     parseCompactArrayTopicNames(src);
   }
 
