@@ -18,10 +18,12 @@ public abstract class Request {
     String clientId = getClientId(reqPayload);
     reqPayload.get(); // tag buffer
 
-    if (requestApiVersion < 0 || requestApiVersion > 4) {
-      request = new UnsupportedApiVersionErrorRequest();
-    } else if (requestApiKey == Main.API_KEY_API_VERSIONS) {
-      request = new ApiVersionsRequest();
+    if (requestApiKey == Main.API_KEY_API_VERSIONS) {
+      if (requestApiVersion < 0 || requestApiVersion > 4) {
+        request = new UnsupportedApiVersionErrorRequest();
+      } else {
+        request = new ApiVersionsRequest();
+      }
     } else if (requestApiKey == Main.API_KEY_DESCRIBE_TOPIC_PARTITIONS) {
       request = new DescribeTopicPartitionsRequest();
     } else if (requestApiKey == Main.API_KEY_FETCH) {
