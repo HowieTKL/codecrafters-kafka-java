@@ -85,4 +85,13 @@ class Utils {
     return result;
   }
 
+  static String bytesToHex(byte[] bytes) {
+    StringBuilder hexString = new StringBuilder();
+    for (byte b : bytes) {
+      String hex = String.format("%02x", b);
+      hexString.append(hex);
+    }
+    return hexString.toString();
+  }
+
 }

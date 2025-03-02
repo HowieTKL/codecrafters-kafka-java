@@ -60,4 +60,5 @@ class UtilsTest {
     Utils.putUnsignedVarInt(out, 127);
     assertArrayEquals(new byte[]{127}, out.toByteArray());
   }
+
 }

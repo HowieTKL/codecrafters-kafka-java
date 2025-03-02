@@ -1,3 +1,6 @@
+import java.util.ArrayList;
+import java.util.List;
+
 public class PartitionRecordValue extends RecordValue {
   /*
 - Value (Partition Record)
@@ -17,6 +20,17 @@ public class PartitionRecordValue extends RecordValue {
   - Tagged Fields Count
    */
   static final byte TYPE = 0x3; // 3
+  byte[] partitionId = new byte[4];
+  byte[] topicUUID = new byte[16];
+  List<byte[]> replicaArray = new ArrayList<>(); // 4-bytes each
+  List<byte[]> inSyncReplicaArray = new ArrayList<>(); // 4-bytes each
+  int RemovingReplicasArrayLength; // varint unsigned
+  int addingReplicasArrayLength; // varint unsigned
+  int leader; // 4-bytes
+  int leaderEpoch; // 4-bytes
+  int partitionEpoch; // 4-bytes
+  List<byte[]> directoriesArray = new ArrayList<>(); // 16-bytes directory UUIDs
+  int taggedFieldsCount; // varint unsigned
 
   @Override
   byte getType() {

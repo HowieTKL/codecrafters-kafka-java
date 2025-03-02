@@ -3,6 +3,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 class Metadata {
@@ -33,6 +34,21 @@ class Metadata {
       }
     }
     return null;
+  }
+
+  List<PartitionRecordValue> findPartitionRecordValues(byte[] topicUUID) {
+    List<PartitionRecordValue> partitionRecordValues = new ArrayList<>();
+    for (RecordBatch recordBatch : recordBatches) {
+      for (Record record : recordBatch.records) {
+        if (record.recordValue.getType() == PartitionRecordValue.TYPE) {
+          PartitionRecordValue partitionRecordValue = (PartitionRecordValue) record.recordValue;
+          if (Arrays.equals(partitionRecordValue.topicUUID, topicUUID)) {
+            partitionRecordValues.add(partitionRecordValue);
+          }
+        }
+      }
+    }
+    return partitionRecordValues;
   }
 
   static List<RecordBatch> getMetadataLog() throws IOException {
@@ -119,8 +135,9 @@ System.out.println("record value type: " + type);
     TopicRecordValue recordValue = new TopicRecordValue();
     recordValue.version = src.get();
     recordValue.topicName = Utils.getCompactString(src);
-    System.out.println("   record value topic name:" + recordValue.topicName);
+    System.out.println("    topicName:" + recordValue.topicName);
     src.get(recordValue.topicUUID);
+    System.out.println("    topicUUID:" + Utils.bytesToHex(recordValue.topicUUID));
     recordValue.taggedFieldsCount = Utils.getUnsignedVarInt(src);
     return recordValue;
   }
@@ -128,6 +145,11 @@ System.out.println("record value type: " + type);
   static PartitionRecordValue getPartitionRecordValue(ByteBuffer src) throws IOException {
     System.out.println("   PartitionRecordValue");
     PartitionRecordValue recordValue = new PartitionRecordValue();
+    recordValue.version = src.get();
+    src.get(recordValue.partitionId);
+    System.out.println("    partitionId:" + recordValue.partitionId);
+    src.get(recordValue.topicUUID);
+    System.out.println("    topicUUID:" + Utils.bytesToHex(recordValue.topicUUID));
     // todo
     return recordValue;
   }
