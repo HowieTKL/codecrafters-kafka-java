@@ -18,7 +18,6 @@ public class DescribeTopicPartitionsRequest extends Request {
     for (int i = 0; i < arraySize; i++) {
       topicNames.add(parseCompactStringTopicName(src));
     }
-    src.get(); // tag buffer
   }
 
   private String parseCompactStringTopicName(ByteBuffer src) throws IOException {
@@ -26,7 +25,8 @@ public class DescribeTopicPartitionsRequest extends Request {
     byte[] topicNameBytes = new byte[topicNameSize];
     src.get(topicNameBytes);
     String topicName = new String(topicNameBytes, StandardCharsets.UTF_8);
-    System.out.println("request topic=" + topicName);
+    System.out.println(" request topic=" + topicName);
+    src.get(); // tag buffer
     return topicName;
   }
 
