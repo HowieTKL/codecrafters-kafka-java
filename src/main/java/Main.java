@@ -86,7 +86,17 @@ public class Main {
       handleApiVersions((ApiVersionsRequest) request, resPayload);
     } else if (request instanceof DescribeTopicPartitionsRequest) {
       handleDescribeTopicPartitions((DescribeTopicPartitionsRequest) request, resPayload);
+    } else if (request instanceof FetchRequest) {
+      handleFetch((FetchRequest) request, resPayload);
     }
+  }
+
+  static void handleFetch(FetchRequest request, ByteArrayOutputStream resPayload) throws IOException {
+    System.out.println("handleRequest API_KEY_FETCH");
+    resPayload.write(ERR_NONE);
+    resPayload.write(0); // tag buffer
+    resPayload.write(new byte[]{0, 0, 0, 0}); // throttle time
+    resPayload.write(0); // tag buffer
   }
 
   static void handleApiVersions(ApiVersionsRequest  request, ByteArrayOutputStream resPayload) throws IOException {

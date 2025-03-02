@@ -24,6 +24,8 @@ public abstract class Request {
       request = new ApiVersionsRequest();
     } else if (requestApiKey == Main.API_KEY_DESCRIBE_TOPIC_PARTITIONS) {
       request = new DescribeTopicPartitionsRequest();
+    } else if (requestApiKey == Main.API_KEY_FETCH) {
+      request = new FetchRequest();
     } else {
       throw new IllegalArgumentException("Unknown request api key");
     }
