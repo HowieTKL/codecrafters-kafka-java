@@ -88,7 +88,7 @@ class Metadata {
       src.get(recordValueBytes);
       ByteBuffer rvSrc = ByteBuffer.wrap(recordValueBytes);
       byte frameVersion = rvSrc.get();
-      int type = src.get();
+      int type = rvSrc.get();
 System.out.println("record value type: " + type);
       switch (type) {
         case TopicRecordValue.TYPE -> record.recordValue = getTopicRecordValue(rvSrc);
@@ -98,8 +98,8 @@ System.out.println("record value type: " + type);
       }
       if (record.recordValue != null) {
         record.recordValue.frameVersion = frameVersion;
-        record.headersArrayCount = Utils.getUnsignedVarInt(src);
       }
+      record.headersArrayCount = Utils.getUnsignedVarInt(src);
     }
     return record;
   }
