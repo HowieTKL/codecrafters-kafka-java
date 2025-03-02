@@ -93,10 +93,12 @@ public class Main {
 
   static void handleFetch(FetchRequest request, ByteArrayOutputStream resPayload) throws IOException {
     System.out.println("handleRequest API_KEY_FETCH");
+    resPayload.write(0); // tag buffer
     resPayload.write(ERR_NONE);
-    resPayload.write(0); // tag buffer
     resPayload.write(new byte[]{0, 0, 0, 0}); // throttle time
-    resPayload.write(0); // tag buffer
+    resPayload.write(new byte[] {0, 0, 0, 0});
+    resPayload.write((byte)0);
+    resPayload.write((byte)0); // tag buffer
   }
 
   static void handleApiVersions(ApiVersionsRequest  request, ByteArrayOutputStream resPayload) throws IOException {
