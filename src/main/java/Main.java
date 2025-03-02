@@ -94,10 +94,10 @@ public class Main {
   static void handleFetch(FetchRequest request, ByteArrayOutputStream resPayload) throws IOException {
     System.out.println("handleRequest API_KEY_FETCH");
     resPayload.write(0); // tag buffer
-    resPayload.write(ERR_NONE);
     resPayload.write(new byte[]{0, 0, 0, 0}); // throttle time
-    resPayload.write(new byte[] {0, 0, 0, 0});
-    resPayload.write((byte)0);
+    resPayload.write(ERR_NONE);
+    resPayload.write(new byte[] {0, 0, 0, 0}); // session id
+    resPayload.write((byte)0); // responses
     resPayload.write((byte)0); // tag buffer
   }
 
