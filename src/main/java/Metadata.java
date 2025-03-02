@@ -86,10 +86,12 @@ class Metadata {
       ByteBuffer rvSrc = ByteBuffer.wrap(recordValueBytes);
       byte frameVersion = rvSrc.get();
       int type = src.get();
+System.out.println("record value type: " + type);
       switch (type) {
         case TopicRecordValue.TYPE -> record.recordValue = getTopicRecordValue(rvSrc);
         case PartitionRecordValue.TYPE -> record.recordValue = getPartitionRecordValue(rvSrc);
         case FeatureLevelRecordValue.TYPE -> record.recordValue = getFeatureLevelRecordValue(rvSrc);
+        default -> throw new IllegalStateException("Unexpected record type: " + type);
       }
       record.recordValue.frameVersion = frameVersion;
       record.headersArrayCount = Utils.getUnsignedVarInt(src);
