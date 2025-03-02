@@ -14,6 +14,7 @@ public class DescribeTopicPartitionsRequest extends Request {
 
   void parseCompactArrayTopicNames(ByteBuffer src) throws IOException {
     int arraySize = Utils.getUnsignedVarInt(src) - 1;
+    System.out.println(" numTopics=" + arraySize);
     for (int i = 0; i < arraySize; i++) {
       topicNames.add(parseCompactStringTopicName(src));
     }

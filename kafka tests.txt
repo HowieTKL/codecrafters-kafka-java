@@ -12,3 +12,7 @@ echo -n
 
 err unsupported
 echo -n "00000023001200446f7fc66100096b61666b612d636c69000a6b61666b612d636c6904302e3100" | xxd -r -p | nc localhost 9092 | hexdump -C
+
+
+describe multiple topics
+echo -n "0000002d004b00004dc31e0a000c6b61666b612d746573746572000404706178000470617a000471757a0000000004ff00" | xxd -r -p | nc localhost 9092 | hexdump -C

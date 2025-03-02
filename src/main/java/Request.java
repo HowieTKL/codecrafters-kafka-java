@@ -31,6 +31,9 @@ public abstract class Request {
     request.requestApiVersion = requestApiVersion;
     request.clientId = clientId;
     request.correlationId = correlationId;
+
+    System.out.println("request clientId=" + clientId);
+    System.out.println("request correlationId=" + Utils.bytesToHex(correlationId));
     return request;
   }
 
