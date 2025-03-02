@@ -98,7 +98,11 @@ public class Main {
     resPayload.write(new byte[]{0, 0, 0, 0}); // throttle time
     resPayload.write(ERR_NONE);
     resPayload.write(new byte[] {0, 0, 0, 0}); // session id
-    resPayload.write((byte)0); // responses
+    resPayload.write((byte)1); // responses=1
+    resPayload.write(request.topicUUIDs.getFirst());
+    resPayload.write((byte)1); // partitions=1
+    resPayload.write(new byte[] {0, 0, 0, 0}); // partition index
+    resPayload.write(ERR_UNKNOWN_TOPIC);
     resPayload.write((byte)0); // tag buffer
   }
 
