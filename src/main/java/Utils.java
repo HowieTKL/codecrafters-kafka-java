@@ -1,42 +1,58 @@
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 
 class Utils {
 
-  static void writeCompactString(OutputStream out, String string) throws IOException {
-    putUnsignedVarInt(string.length() + 1, out);
+  static void putCompactString(OutputStream out, String string) throws IOException {
+    putUnsignedVarInt(out, string.length() + 1);
     out.write(string.getBytes(StandardCharsets.UTF_8));
   }
 
-  static int getSignedVarInt(InputStream inputStream) throws IOException {
-    int value = getUnsignedVarInt(inputStream);
+  static String getCompactString(ByteBuffer src) throws IOException {
+    int size = getUnsignedVarInt(src) - 1;
+    byte[] stringBytes = new byte[size];
+    src.get(stringBytes);
+    return new String(stringBytes, StandardCharsets.UTF_8);
+  }
+
+  static void putCompactArray(OutputStream out, List<byte[]> array) throws IOException {
+    putUnsignedVarInt(out, array.size() + 1);
+    for (byte[] a : array) {
+      out.write(a);
+    }
+  }
+
+  static int getSignedVarInt(ByteBuffer src) throws IOException {
+    int value = getUnsignedVarInt(src);
     return (value >>> 1) ^ -(value & 1);
   }
 
   /* Adapted from
    * https://github.com/bazelbuild/bazel/blob/master/src/main/java/com/google/devtools/build/lib/util/VarInt.java
    */
-  static int getUnsignedVarInt(InputStream src) throws IOException {
+  static int getUnsignedVarInt(ByteBuffer src) throws IOException {
     int tmp;
-    if ((tmp = src.read()) >= 0) {
+    if ((tmp = src.get()) >= 0) {
       return tmp;
     }
     int result = tmp & 0x7f;
-    if ((tmp = src.read()) >= 0) {
+    if ((tmp = src.get()) >= 0) {
       result |= tmp << 7;
     } else {
       result |= (tmp & 0x7f) << 7;
-      if ((tmp = src.read()) >= 0) {
+      if ((tmp = src.get()) >= 0) {
         result |= tmp << 14;
       } else {
         result |= (tmp & 0x7f) << 14;
-        if ((tmp = src.read()) >= 0) {
+        if ((tmp = src.get()) >= 0) {
           result |= tmp << 21;
         } else {
           result |= (tmp & 0x7f) << 21;
-          result |= (tmp = src.read()) << 28;
+          result |= (tmp = src.get()) << 28;
           if (tmp < 0) {
             throw new IllegalArgumentException("varint too large");
           }
@@ -45,7 +61,7 @@ class Utils {
     }
     return result;
   }
-  static void putUnsignedVarInt(int v, OutputStream outputStream) throws IOException {
+  static void putUnsignedVarInt(OutputStream outputStream, int v) throws IOException {
     byte[] bytes = new byte[unsignedVarIntSize(v)];
     putUnsignedVarInt(v, bytes, 0);
     outputStream.write(bytes);

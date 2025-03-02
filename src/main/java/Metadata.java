@@ -1,0 +1,121 @@
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.ByteBuffer;
+import java.util.ArrayList;
+import java.util.List;
+
+class Metadata {
+  static final Metadata instance = new Metadata();
+
+  List<RecordBatch> recordBatches;
+  private Metadata() {
+    try {
+      recordBatches = getMetadataLog();
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+  }
+
+  static Metadata getInstance() {
+    return instance;
+  }
+
+  byte[] findTopicUUID(String topicName) {
+    return null;
+  }
+
+  static List<RecordBatch> getMetadataLog() throws IOException {
+    System.out.println("Attempting to read: " + Main.KAFKA_CLUSTER_METADATA_LOG_PATH);
+    List<RecordBatch> recordBatches = new ArrayList<>();
+    ByteBuffer src;
+    try (InputStream is = new FileInputStream(Main.KAFKA_CLUSTER_METADATA_LOG_PATH)) {
+      src = ByteBuffer.wrap(is.readAllBytes());
+    }
+    while (src.hasRemaining()) {
+      recordBatches.add(getRecordBatch(src));
+    }
+    return recordBatches;
+  }
+
+  static RecordBatch getRecordBatch(ByteBuffer src) throws IOException {
+    System.out.println("Parsing record batch");
+    RecordBatch recBatch = new RecordBatch();
+    src.get(recBatch.baseOffset);
+    src.get(recBatch.batchLength);
+    src.get(recBatch.partitionLeaderEpoch);
+    recBatch.magicByte = src.get();
+    src.get(recBatch.crc);
+    src.get(recBatch.attributes);
+    src.get(recBatch.lastOffsetDelta);
+    src.get(recBatch.baseTimestamp);
+    src.get(recBatch.maxTimestamp);
+    src.get(recBatch.producerId);
+    src.get(recBatch.producerEpoch);
+    src.get(recBatch.baseSequence);
+    recBatch.records = getRecords(src);
+    return recBatch;
+  }
+
+  static List<Record> getRecords(ByteBuffer src) throws IOException {
+    System.out.println("Parsing records");
+    List<Record> records = new ArrayList<>();
+    int numRecords = src.getInt();
+    for (int i = 0; i < numRecords; i++) {
+      records.add(getRecord(src));
+    }
+    return records;
+  }
+
+  static Record getRecord(ByteBuffer src) throws IOException {
+    System.out.println("Parsing record");
+    Record record = new Record();
+    record.length = Utils.getSignedVarInt(src);
+    record.attributes = src.get(); // attributes (unused)
+    record.timestamp = Utils.getSignedVarInt(src);
+    record.offset = Utils.getSignedVarInt(src);
+    record.keyLength = Utils.getSignedVarInt(src);
+    if (record.keyLength > 0) {
+      record.key = new byte[record.keyLength];
+      src.get(record.key);
+    }
+    record.valueLength = Utils.getSignedVarInt(src);
+    if (record.valueLength > 0) {
+      byte[] recordValueBytes = new byte[record.valueLength];
+      src.get(recordValueBytes);
+      ByteBuffer rvSrc = ByteBuffer.wrap(recordValueBytes);
+      byte frameVersion = rvSrc.get();
+      int type = src.get();
+      switch (type) {
+        case TopicRecordValue.TYPE -> record.recordValue = getTopicRecordValue(rvSrc);
+        case PartitionRecordValue.TYPE -> record.recordValue = getPartitionRecordValue(rvSrc);
+        case FeatureLevelRecordValue.TYPE -> record.recordValue = getFeatureLevelRecordValue(rvSrc);
+      }
+      record.recordValue.frameVersion = frameVersion;
+      record.headersArrayCount = Utils.getUnsignedVarInt(src);
+    }
+    return record;
+  }
+
+  static TopicRecordValue getTopicRecordValue(ByteBuffer src) throws IOException {
+    System.out.println("Parsing TopicRecordValue");
+    TopicRecordValue recordValue = new TopicRecordValue();
+    // todo
+    return recordValue;
+  }
+
+  static PartitionRecordValue getPartitionRecordValue(ByteBuffer src) throws IOException {
+    System.out.println("Parsing PartitionRecordValue");
+    PartitionRecordValue recordValue = new PartitionRecordValue();
+    // todo
+    return recordValue;
+  }
+
+  static FeatureLevelRecordValue getFeatureLevelRecordValue(ByteBuffer src) throws IOException {
+    System.out.println("Parsing FeatureLevelRecordValue");
+    FeatureLevelRecordValue recordValue = new FeatureLevelRecordValue();
+    // todo
+    return recordValue;
+  }
+
+}
