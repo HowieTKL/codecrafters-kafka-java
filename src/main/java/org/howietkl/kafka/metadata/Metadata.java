@@ -68,7 +68,7 @@ public class Metadata {
         .map(record -> record.recordValue)
         .filter(recordValue -> recordValue.getType() == PartitionRecordValue.TYPE)
         .map(recordValue -> (PartitionRecordValue) recordValue)
-        .filter(partitionRecordValue -> partitionRecordValue.topicUUID.equals(topicUUID))
+        .filter(partitionRecordValue -> Arrays.equals(partitionRecordValue.topicUUID, topicUUID))
         .toList();
   }
 
