@@ -5,6 +5,8 @@ import java.io.OutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.nio.ByteBuffer;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -216,8 +218,13 @@ public class Main {
   }
 
   static List<byte[]> getRecords(byte[] topicUUID, int partitionId) throws IOException {
+    System.out.println("getRecords topicUUID=" + Utils.bytesToHex(topicUUID) + " partitionId=" + partitionId);
     String topicName = Metadata.getInstance().findTopicName(topicUUID);
-    TopicPartitionFile file = new TopicPartitionFile(topicName, partitionId);
-    return file.getRecords();
+    if (topicName != null) {
+      TopicPartitionFile file = new TopicPartitionFile(topicName, partitionId);
+      return file.getRecords();
+    } else {
+      return Collections.EMPTY_LIST;
+    }
   }
 }
