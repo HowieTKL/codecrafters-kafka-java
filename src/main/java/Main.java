@@ -108,10 +108,14 @@ public class Main {
       resPayload.write(new byte[]{0, 0, 0, 0}); // partition index
       resPayload.write(ERR_UNKNOWN_TOPIC);
       resPayload.write(new byte[]{0, 0, 0, 0, 0, 0, 0, 0}); // high watermark
-      resPayload.write(new byte[]{0, 0, 0, 0, 0, 0, 0, 0}); //
-      resPayload.write(new byte[]{0, 0, 0, 0, 0, 0, 0, 0}); //
+      resPayload.write(new byte[]{0, 0, 0, 0, 0, 0, 0, 0}); // last_stable_offset
+      resPayload.write(new byte[]{0, 0, 0, 0, 0, 0, 0, 0}); // log_start_offset
       resPayload.write((byte) 0); // tag buffer
-      Utils.putUnsignedVarInt(resPayload, 0);
+      Utils.putUnsignedVarInt(resPayload, 0); // aborted_transactions
+      // resPayload.write(new byte[]{0, 0, 0, 0, 0, 0, 0, 0}); // aborted producer id
+      // resPayload.write(new byte[]{0, 0, 0, 0, 0, 0, 0, 0}); // aborted first offset
+      resPayload.write(new byte[]{0, 0, 0, 0}); // preferred read replica
+      Utils.putUnsignedVarInt(resPayload, 0); // records
       resPayload.write((byte) 0); // tag buffer
     }
   }
