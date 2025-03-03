@@ -10,7 +10,6 @@ import org.slf4j.LoggerFactory;
 
 public abstract class Request {
   public static final short API_KEY_FETCH = 1;
-
   public static final short API_KEY_API_VERSIONS = 18;
   public static final short API_KEY_DESCRIBE_TOPIC_PARTITIONS = 75;
 

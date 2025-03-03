@@ -1,3 +1,4 @@
+import org.howietkl.kafka.response.Response;
 import org.junit.jupiter.api.Test;
 
 import java.io.ByteArrayOutputStream;
@@ -37,7 +38,7 @@ class MainTest {
     byte[] correlationId = new byte[4];
     resBuffer.get(correlationId);
     assertArrayEquals(new byte[]{1,1,1,1}, correlationId); // correlationId
-    assertEquals(ByteBuffer.wrap(Main.ERR_UNSUPPORTED_VERSION).getShort(), resBuffer.getShort());
+    assertEquals(ByteBuffer.wrap(Response.ERR_UNSUPPORTED_VERSION).getShort(), resBuffer.getShort());
 
     resPayload = new ByteArrayOutputStream();
     reqPayload = ByteBuffer.wrap(new byte[]{0,18, 0,-1, 1,0,0,1, 0,1, 97, 0,0});
@@ -46,6 +47,6 @@ class MainTest {
     correlationId = new byte[4];
     resBuffer.get(correlationId);
     assertArrayEquals(new byte[]{1,0,0,1}, correlationId); // correlationId
-    assertEquals(ByteBuffer.wrap(Main.ERR_UNSUPPORTED_VERSION).getShort(), resBuffer.getShort());
+    assertEquals(ByteBuffer.wrap(Response.ERR_UNSUPPORTED_VERSION).getShort(), resBuffer.getShort());
   }
  }
