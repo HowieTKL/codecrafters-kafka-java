@@ -35,15 +35,15 @@ public class DescribeTopicPartitionsResponse extends Response<DescribeTopicParti
         Utils.putUnsignedVarInt(out, partitions.size() + 1);
         for (PartitionRecordValue partition : partitions) {
           out.write(ERR_NONE);
-          out.write(partition.partitionId);
-          out.write(partition.leader);
-          out.write(partition.leaderEpoch);
-          Utils.putUnsignedVarInt(out, partition.replicaArray.size() + 1);
-          for (byte[] replica: partition.replicaArray) {
+          out.write(partition.getPartitionId());
+          out.write(partition.getLeader());
+          out.write(partition.getLeaderEpoch());
+          Utils.putUnsignedVarInt(out, partition.getReplicaArray().size() + 1);
+          for (byte[] replica: partition.getReplicaArray()) {
             out.write(replica);
           }
-          Utils.putUnsignedVarInt(out, partition.inSyncReplicaArray.size() + 1);
-          for (byte[] inSyncReplica: partition.inSyncReplicaArray) {
+          Utils.putUnsignedVarInt(out, partition.getInSyncReplicaArray().size() + 1);
+          for (byte[] inSyncReplica: partition.getInSyncReplicaArray()) {
             out.write(inSyncReplica);
           }
           out.write(new byte[]{1}); // eligible leader replicas
