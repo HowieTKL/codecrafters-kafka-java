@@ -1,6 +1,6 @@
 package org.howietkl.kafka.metadata;
 
-public class TopicRecordValue extends RecordValue {
+class TopicRecordValue extends RecordValue {
 /*
 ↓ Value (Topic Record)
 - Frame Version

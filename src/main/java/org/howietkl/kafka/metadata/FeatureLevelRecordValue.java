@@ -1,6 +1,6 @@
 package org.howietkl.kafka.metadata;
 
-public class FeatureLevelRecordValue extends RecordValue {
+class FeatureLevelRecordValue extends RecordValue {
   /*
 - Value (Feature Level Record)
   - Name length
