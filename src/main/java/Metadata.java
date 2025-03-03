@@ -2,14 +2,14 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 class Metadata {
   static final Metadata instance = new Metadata();
 
-  List<RecordBatch> recordBatches;
+  private List<RecordBatch> recordBatches;
+  private final Map<UUID, String> topicUUID2Name = new HashMap<>();
+
   private Metadata() {
     try {
       recordBatches = getMetadataLog();
@@ -51,6 +51,11 @@ class Metadata {
     return partitionRecordValues;
   }
 
+  String findTopicName(byte[] topicUUID) {
+    return topicUUID2Name.get(UUID.nameUUIDFromBytes(topicUUID));
+  }
+
+  // FYI not thread safe, but fine for this single thread reading from file
   static List<RecordBatch> getMetadataLog() throws IOException {
     System.out.println("Attempting to read: " + Main.KAFKA_CLUSTER_METADATA_LOG_PATH);
     List<RecordBatch> recordBatches = new ArrayList<>();
@@ -139,6 +144,11 @@ System.out.println("record value type: " + type);
     src.get(recordValue.topicUUID);
     System.out.println("    topicUUID:" + Utils.bytesToHex(recordValue.topicUUID));
     recordValue.taggedFieldsCount = Utils.getUnsignedVarInt(src);
+
+    // update index
+    UUID uuid = UUID.nameUUIDFromBytes(recordValue.topicUUID);
+    getInstance().topicUUID2Name.put(UUID.nameUUIDFromBytes(recordValue.topicUUID), recordValue.topicName);
+
     return recordValue;
   }
 
@@ -150,6 +160,7 @@ System.out.println("record value type: " + type);
     System.out.println("    partitionId:" + Utils.bytesToHex(recordValue.partitionId));
     src.get(recordValue.topicUUID);
     System.out.println("    topicUUID:" + Utils.bytesToHex(recordValue.topicUUID));
+
     {
       int replicaArrayLength = Utils.getUnsignedVarInt(src) - 1;
       for (int i = 0; i < replicaArrayLength; i++) {
@@ -199,9 +210,8 @@ System.out.println("record value type: " + type);
 
   static FeatureLevelRecordValue getFeatureLevelRecordValue(ByteBuffer src) throws IOException {
     System.out.println("   FeatureLevelRecordValue");
-    FeatureLevelRecordValue recordValue = new FeatureLevelRecordValue();
+    return new FeatureLevelRecordValue();
     // todo
-    return recordValue;
   }
 
 }

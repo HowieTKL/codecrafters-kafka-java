@@ -5,6 +5,7 @@ import java.io.OutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.nio.ByteBuffer;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -14,6 +15,7 @@ public class Main {
   private static final int THREADS = 4;
 
   static final String KAFKA_CLUSTER_METADATA_LOG_PATH = "/tmp/kraft-combined-logs/__cluster_metadata-0/00000000000000000000.log";
+  static final String KAFKA_TOPIC_PARTITION_LOG_PATH = "/tmp/kraft-combined-logs/%s-%d/00000000000000000000.log"; // %s= topic name, %d=partition index
 
   static final short API_KEY_FETCH = 1;
   static final short API_KEY_API_VERSIONS = 18;
@@ -128,7 +130,7 @@ public class Main {
           // resPayload.write(new byte[]{0, 0, 0, 0, 0, 0, 0, 0}); // aborted producer id
           // resPayload.write(new byte[]{0, 0, 0, 0, 0, 0, 0, 0}); // aborted first offset
           resPayload.write(new byte[]{0, 0, 0, 0}); // preferred read replica
-          Utils.putUnsignedVarInt(resPayload, 0); // varint records
+          resPayload.write(getPartition(topicUUID, partition.partitionId));
           resPayload.write((byte) 0); // tag buffer - partition
         }
       }
@@ -206,9 +208,14 @@ public class Main {
         resPayload.write(new byte[]{0}); // tag buffer
       }
     }
-
     resPayload.write(new byte[]{(byte) 0xFF}); // cursor
     resPayload.write(new byte[]{0}); // tag buffer
   }
 
+  static byte[] getPartition(byte[] topicUUID, byte[] partitionId) throws IOException {
+    String topicName = Metadata.getInstance().findTopicName(topicUUID);
+    int partitionIndex = ByteBuffer.wrap(partitionId).getInt();
+    TopicPartitionFile file = new TopicPartitionFile(topicName, partitionIndex);
+    return file.getData();
+  }
 }
