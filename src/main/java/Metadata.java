@@ -8,7 +8,7 @@ class Metadata {
   static final Metadata instance = new Metadata();
 
   private List<RecordBatch> recordBatches;
-  private final Map<UUID, String> topicUUID2Name = new HashMap<>();
+  private static final Map<UUID, String> topicUUID2Name = new HashMap<>();
 
   private Metadata() {
     try {
@@ -147,7 +147,7 @@ System.out.println("record value type: " + type);
 
     // update index
     UUID uuid = UUID.nameUUIDFromBytes(recordValue.topicUUID);
-    getInstance().topicUUID2Name.put(UUID.nameUUIDFromBytes(recordValue.topicUUID), recordValue.topicName);
+    topicUUID2Name.put(UUID.nameUUIDFromBytes(recordValue.topicUUID), recordValue.topicName);
 
     return recordValue;
   }
