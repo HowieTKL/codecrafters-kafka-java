@@ -98,7 +98,6 @@ public class Main {
     resPayload.write(new byte[]{0, 0, 0, 0}); // throttle time
     resPayload.write(ERR_NONE);
     resPayload.write(new byte[]{0, 0, 0, 0}); // session id
-    resPayload.write((byte) 1); // responses=1
     Utils.putUnsignedVarInt(resPayload, request.topicUUIDs.size() + 1);
     for (int i = 0; i < request.topicUUIDs.size(); i++) {
       byte[] topicUUID = request.topicUUIDs.get(i);
