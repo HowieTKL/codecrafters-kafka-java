@@ -103,19 +103,35 @@ public class Main {
       byte[] topicUUID = request.topicUUIDs.get(i);
       resPayload.write(topicUUID);
       List<PartitionRecordValue> partitions = Metadata.getInstance().findPartitionRecordValues(topicUUID);
-      resPayload.write((byte) 2); // partitions=1
-      resPayload.write(new byte[]{0, 0, 0, 0}); // partition index
-      resPayload.write(ERR_UNKNOWN_TOPIC);
-      resPayload.write(new byte[]{0, 0, 0, 0, 0, 0, 0, 0}); // high watermark
-      resPayload.write(new byte[]{0, 0, 0, 0, 0, 0, 0, 0}); // last_stable_offset
-      resPayload.write(new byte[]{0, 0, 0, 0, 0, 0, 0, 0}); // log_start_offset
-      Utils.putUnsignedVarInt(resPayload, 0); // varint aborted_transactions
-      // resPayload.write(new byte[]{0, 0, 0, 0, 0, 0, 0, 0}); // aborted producer id
-      // resPayload.write(new byte[]{0, 0, 0, 0, 0, 0, 0, 0}); // aborted first offset
-      resPayload.write(new byte[]{0, 0, 0, 0}); // preferred read replica
-      Utils.putUnsignedVarInt(resPayload, 0); // varint records
-      resPayload.write((byte) 0); // tag buffer - partition
-
+      if (partitions.isEmpty()) {
+        resPayload.write((byte) 2); // partitions=1
+        resPayload.write(new byte[]{0, 0, 0, 0}); // partition index
+        resPayload.write(ERR_UNKNOWN_TOPIC);
+        resPayload.write(new byte[]{0, 0, 0, 0, 0, 0, 0, 0}); // high watermark
+        resPayload.write(new byte[]{0, 0, 0, 0, 0, 0, 0, 0}); // last_stable_offset
+        resPayload.write(new byte[]{0, 0, 0, 0, 0, 0, 0, 0}); // log_start_offset
+        Utils.putUnsignedVarInt(resPayload, 0); // varint aborted_transactions
+        // resPayload.write(new byte[]{0, 0, 0, 0, 0, 0, 0, 0}); // aborted producer id
+        // resPayload.write(new byte[]{0, 0, 0, 0, 0, 0, 0, 0}); // aborted first offset
+        resPayload.write(new byte[]{0, 0, 0, 0}); // preferred read replica
+        Utils.putUnsignedVarInt(resPayload, 0); // varint records
+        resPayload.write((byte) 0); // tag buffer - partition
+      } else {
+        Utils.putUnsignedVarInt(partitions.size() + 1);
+        for (PartitionRecordValue partition : partitions) {
+          resPayload.write(partition.partitionId); // partition index
+          resPayload.write(ERR_NONE);
+          resPayload.write(new byte[]{0, 0, 0, 0, 0, 0, 0, 0}); // high watermark
+          resPayload.write(new byte[]{0, 0, 0, 0, 0, 0, 0, 0}); // last_stable_offset
+          resPayload.write(new byte[]{0, 0, 0, 0, 0, 0, 0, 0}); // log_start_offset
+          Utils.putUnsignedVarInt(resPayload, 0); // varint aborted_transactions
+          // resPayload.write(new byte[]{0, 0, 0, 0, 0, 0, 0, 0}); // aborted producer id
+          // resPayload.write(new byte[]{0, 0, 0, 0, 0, 0, 0, 0}); // aborted first offset
+          resPayload.write(new byte[]{0, 0, 0, 0}); // preferred read replica
+          Utils.putUnsignedVarInt(resPayload, 0); // varint records
+          resPayload.write((byte) 0); // tag buffer - partition
+        }
+      }
       resPayload.write((byte) 0); // tag buffer - topic
     }
     resPayload.write((byte) 0); // tag buffer
