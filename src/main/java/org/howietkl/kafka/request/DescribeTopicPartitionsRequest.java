@@ -1,5 +1,6 @@
-package org.howietkl.kafka;
+package org.howietkl.kafka.request;
 
+import org.howietkl.kafka.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

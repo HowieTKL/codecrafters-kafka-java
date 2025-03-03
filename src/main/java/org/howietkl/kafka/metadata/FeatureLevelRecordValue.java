@@ -1,8 +1,8 @@
-package org.howietkl.kafka;
+package org.howietkl.kafka.metadata;
 
 public class FeatureLevelRecordValue extends RecordValue {
   /*
-- Value (Feature Level org.howietkl.kafka.Record)
+- Value (Feature Level Record)
   - Name length
   - Name
   - Feature Level

@@ -1,11 +1,11 @@
-package org.howietkl.kafka;
+package org.howietkl.kafka.metadata;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class PartitionRecordValue extends RecordValue {
   /*
-- Value (Partition org.howietkl.kafka.Record)
+- Value (Partition Record)
   - Partition ID
   - Topic UUID
   - Length of replica array

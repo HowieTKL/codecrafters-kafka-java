@@ -1,4 +1,7 @@
 import org.howietkl.kafka.*;
+import org.howietkl.kafka.metadata.Metadata;
+import org.howietkl.kafka.metadata.PartitionRecordValue;
+import org.howietkl.kafka.request.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -136,7 +139,7 @@ public class Main {
     resPayload.write((byte) 0); // tag buffer
   }
 
-  static void handleApiVersions(ApiVersionsRequest  request, ByteArrayOutputStream resPayload) throws IOException {
+  static void handleApiVersions(ApiVersionsRequest request, ByteArrayOutputStream resPayload) throws IOException {
     LOG.debug("handleRequest API_KEY_API_VERSIONS");
     resPayload.write(ERR_NONE);
     resPayload.write(4); // num_api_keys + 1

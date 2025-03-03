@@ -1,4 +1,4 @@
-package org.howietkl.kafka;
+package org.howietkl.kafka.metadata;
 
 public abstract class RecordValue {
   /*

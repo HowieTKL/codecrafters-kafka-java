@@ -1,9 +1,10 @@
-package org.howietkl.kafka;
+package org.howietkl.kafka.request;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 
+import org.howietkl.kafka.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

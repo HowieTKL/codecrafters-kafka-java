@@ -1,4 +1,4 @@
-package org.howietkl.kafka;
+package org.howietkl.kafka.metadata;
 
 import java.util.List;
 
