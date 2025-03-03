@@ -123,7 +123,8 @@ public class Main {
         Utils.putUnsignedVarInt(resPayload, partitions.size() + 1);
         for (Integer partitionId : partitions) {
           resPayload.write(ByteBuffer.allocate(4).putInt(partitionId).array());
-          resPayload.write(ERR_NONE);
+          List<byte[]> records = getRecords(topicUUID, partitionId);
+          resPayload.write(records.isEmpty() ? ERR_UNKNOWN_TOPIC : ERR_NONE);
           resPayload.write(new byte[]{0, 0, 0, 0, 0, 0, 0, 0}); // high watermark
           resPayload.write(new byte[]{0, 0, 0, 0, 0, 0, 0, 0}); // last_stable_offset
           resPayload.write(new byte[]{0, 0, 0, 0, 0, 0, 0, 0}); // log_start_offset
@@ -131,7 +132,6 @@ public class Main {
           // resPayload.write(new byte[]{0, 0, 0, 0, 0, 0, 0, 0}); // aborted producer id
           // resPayload.write(new byte[]{0, 0, 0, 0, 0, 0, 0, 0}); // aborted first offset
           resPayload.write(new byte[]{0, 0, 0, 0}); // preferred read replica
-          List<byte[]> records = getRecords(topicUUID, partitionId);
           Utils.putUnsignedVarInt(resPayload, records.size() + 1);
           for (byte[] record : records) {
             resPayload.write(record);
