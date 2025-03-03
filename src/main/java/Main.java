@@ -117,7 +117,7 @@ public class Main {
         Utils.putUnsignedVarInt(resPayload, 0); // varint records
         resPayload.write((byte) 0); // tag buffer - partition
       } else {
-        Utils.putUnsignedVarInt(partitions.size() + 1);
+        Utils.putUnsignedVarInt(resPayload, partitions.size() + 1);
         for (PartitionRecordValue partition : partitions) {
           resPayload.write(partition.partitionId); // partition index
           resPayload.write(ERR_NONE);
