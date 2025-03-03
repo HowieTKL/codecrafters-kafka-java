@@ -8,6 +8,7 @@ public class TopicPartitionFile {
     path = Path.of(String.format(Main.KAFKA_TOPIC_PARTITION_LOG_PATH, topic, partition));
   }
   public byte[] getData() throws IOException {
+    System.out.println("Reading: " + path);
     return Files.readAllBytes(path);
   }
 }
