@@ -5,18 +5,19 @@ import java.nio.ByteBuffer;
 import java.util.*;
 
 class Metadata {
-  static final Metadata instance = new Metadata();
-  private static Map<UUID, String> topicUUID2Name = new HashMap<>();
+  private static final Metadata instance = new Metadata();
+  private static final List<RecordBatch> recordBatches = new ArrayList<>();
+  private static final Map<UUID, String> topicUUID2Name = new HashMap<>();
 
-
-  private List<RecordBatch> recordBatches;
-
-  private Metadata() {
+  static {
     try {
-      recordBatches = getMetadataLog();
+      readMetadataLog();
     } catch (Exception e) {
       e.printStackTrace();
     }
+  }
+
+  private Metadata() {
   }
 
   static Metadata getInstance() {
@@ -57,9 +58,8 @@ class Metadata {
   }
 
   // FYI not thread safe, but fine for this single thread reading from file
-  static List<RecordBatch> getMetadataLog() throws IOException {
+  static void readMetadataLog() throws IOException {
     System.out.println("Attempting to read: " + Main.KAFKA_CLUSTER_METADATA_LOG_PATH);
-    List<RecordBatch> recordBatches = new ArrayList<>();
     ByteBuffer src;
     try (InputStream is = new FileInputStream(Main.KAFKA_CLUSTER_METADATA_LOG_PATH)) {
       src = ByteBuffer.wrap(is.readAllBytes());
@@ -67,7 +67,6 @@ class Metadata {
     while (src.hasRemaining()) {
       recordBatches.add(getRecordBatch(src));
     }
-    return recordBatches;
   }
 
   static RecordBatch getRecordBatch(ByteBuffer src) throws IOException {
@@ -148,9 +147,6 @@ System.out.println("record value type: " + type);
 
     // update index
     UUID uuid = UUID.nameUUIDFromBytes(recordValue.topicUUID);
-    if (topicUUID2Name == null) {
-      topicUUID2Name = new HashMap<>();
-    }
     topicUUID2Name.put(UUID.nameUUIDFromBytes(recordValue.topicUUID), recordValue.topicName);
 
     return recordValue;
