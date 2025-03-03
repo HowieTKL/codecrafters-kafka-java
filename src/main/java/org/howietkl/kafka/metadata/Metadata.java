@@ -49,6 +49,7 @@ public class Metadata {
   }
 
   public List<PartitionRecordValue> findPartitionRecordValues(byte[] topicUUID) {
+    /*
     List<PartitionRecordValue> partitionRecordValues = new ArrayList<>();
     for (RecordBatch recordBatch : recordBatches) {
       for (Record record : recordBatch.records) {
@@ -61,6 +62,14 @@ public class Metadata {
       }
     }
     return partitionRecordValues;
+     */
+    return recordBatches.stream()
+        .flatMap(recordBatch -> recordBatch.records.stream())
+        .map(record -> record.recordValue)
+        .filter(recordValue -> recordValue.getType() == PartitionRecordValue.TYPE)
+        .map(recordValue -> (PartitionRecordValue) recordValue)
+        .filter(partitionRecordValue -> partitionRecordValue.topicUUID.equals(topicUUID))
+        .toList();
   }
 
   public String findTopicName(byte[] topicUUID) {
