@@ -107,6 +107,11 @@ public class Main {
     resPayload.write((byte) 2); // partitions=1
       resPayload.write(new byte[]{0, 0, 0, 0}); // partition index
       resPayload.write(ERR_UNKNOWN_TOPIC);
+      resPayload.write(new byte[]{0, 0, 0, 0, 0, 0, 0, 0}); // high watermark
+      resPayload.write(new byte[]{0, 0, 0, 0, 0, 0, 0, 0}); //
+      resPayload.write(new byte[]{0, 0, 0, 0, 0, 0, 0, 0}); //
+      resPayload.write((byte) 0); // tag buffer
+      Utils.putUnsignedVarInt(resPayload, 0);
       resPayload.write((byte) 0); // tag buffer
     }
   }
