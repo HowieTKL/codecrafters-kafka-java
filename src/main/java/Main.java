@@ -75,18 +75,21 @@ public class Main {
     Request request = Request.parseRequestHeader(reqPayload);
     request.parseRequest(reqPayload);
     resPayload.write(request.correlationId);
-    if (request instanceof UnsupportedApiVersionErrorRequest) {
-      resPayload.write(ERR_UNSUPPORTED_VERSION);
-      LOG.info("35(ERR_UNSUPPORTED_VERSION)");
-    } else if (request instanceof ApiVersionsRequest) {
-      handleApiVersions((ApiVersionsRequest) request, resPayload);
-    } else if (request instanceof DescribeTopicPartitionsRequest) {
-      handleDescribeTopicPartitions((DescribeTopicPartitionsRequest) request, resPayload);
-    } else if (request instanceof FetchRequest) {
-      handleFetch((FetchRequest) request, resPayload);
-    } else {
-      LOG.error("Unsupported request type={}", request.getClass().getName());
-      throw new UnsupportedOperationException("Unknown request type: " + request);
+    switch (request) {
+      case UnsupportedApiVersionErrorRequest unsupportedApiVersionErrorRequest -> {
+        resPayload.write(ERR_UNSUPPORTED_VERSION);
+        LOG.info("35(ERR_UNSUPPORTED_VERSION)");
+      }
+      case ApiVersionsRequest apiVersionsRequest ->
+          handleApiVersions(apiVersionsRequest, resPayload);
+      case DescribeTopicPartitionsRequest describeTopicPartitionsRequest ->
+          handleDescribeTopicPartitions(describeTopicPartitionsRequest, resPayload);
+      case FetchRequest fetchRequest ->
+          handleFetch(fetchRequest, resPayload);
+      default -> {
+        LOG.error("Unsupported request type={}", request.getClass().getName());
+        throw new UnsupportedOperationException("Unknown request type: " + request);
+      }
     }
   }
 
