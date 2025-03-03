@@ -103,7 +103,7 @@ public class Main {
     for (int i = 0; i < request.topicUUIDs.size(); i++) {
       byte[] topicUUID = request.topicUUIDs.get(i);
       resPayload.write(topicUUID);
-      List<PartitionRecordValue> partitions = Metadata.getInstance().findPartitionRecordValues(topicUUID);
+      List<Integer> partitions = request.partitions;
       if (partitions.isEmpty()) {
         resPayload.write((byte) 2); // partitions=1
         resPayload.write(new byte[]{0, 0, 0, 0}); // partition index
@@ -119,8 +119,8 @@ public class Main {
         resPayload.write((byte) 0); // tag buffer - partition
       } else {
         Utils.putUnsignedVarInt(resPayload, partitions.size() + 1);
-        for (PartitionRecordValue partition : partitions) {
-          resPayload.write(partition.partitionId); // partition index
+        for (Integer partitionId : partitions) {
+          resPayload.write(ByteBuffer.allocate(4).putInt(partitionId).array());
           resPayload.write(ERR_NONE);
           resPayload.write(new byte[]{0, 0, 0, 0, 0, 0, 0, 0}); // high watermark
           resPayload.write(new byte[]{0, 0, 0, 0, 0, 0, 0, 0}); // last_stable_offset
@@ -129,7 +129,7 @@ public class Main {
           // resPayload.write(new byte[]{0, 0, 0, 0, 0, 0, 0, 0}); // aborted producer id
           // resPayload.write(new byte[]{0, 0, 0, 0, 0, 0, 0, 0}); // aborted first offset
           resPayload.write(new byte[]{0, 0, 0, 0}); // preferred read replica
-          List<byte[]> records = getRecords(topicUUID, partition.partitionId);
+          List<byte[]> records = getRecords(topicUUID, partitionId);
           Utils.putUnsignedVarInt(resPayload, records.size() + 1);
           for (byte[] record : records) {
             resPayload.write(record);
@@ -215,10 +215,9 @@ public class Main {
     resPayload.write(new byte[]{0}); // tag buffer
   }
 
-  static List<byte[]> getRecords(byte[] topicUUID, byte[] partitionId) throws IOException {
+  static List<byte[]> getRecords(byte[] topicUUID, int partitionId) throws IOException {
     String topicName = Metadata.getInstance().findTopicName(topicUUID);
-    int partitionIndex = ByteBuffer.wrap(partitionId).getInt();
-    TopicPartitionFile file = new TopicPartitionFile(topicName, partitionIndex);
+    TopicPartitionFile file = new TopicPartitionFile(topicName, partitionId);
     return file.getRecords();
   }
 }
