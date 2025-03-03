@@ -111,11 +111,13 @@ public class Main {
       resPayload.write(new byte[]{0, 0, 0, 0, 0, 0, 0, 0}); // last_stable_offset
       resPayload.write(new byte[]{0, 0, 0, 0, 0, 0, 0, 0}); // log_start_offset
       resPayload.write((byte) 0); // tag buffer
-      Utils.putUnsignedVarInt(resPayload, 0); // aborted_transactions
+      Utils.putUnsignedVarInt(resPayload, 0); // varint aborted_transactions
       // resPayload.write(new byte[]{0, 0, 0, 0, 0, 0, 0, 0}); // aborted producer id
       // resPayload.write(new byte[]{0, 0, 0, 0, 0, 0, 0, 0}); // aborted first offset
       resPayload.write(new byte[]{0, 0, 0, 0}); // preferred read replica
-      Utils.putUnsignedVarInt(resPayload, 0); // records
+      Utils.putUnsignedVarInt(resPayload, 0); // varint records
+      resPayload.write((byte) 0); // tag buffer
+
       resPayload.write((byte) 0); // tag buffer
     }
   }
