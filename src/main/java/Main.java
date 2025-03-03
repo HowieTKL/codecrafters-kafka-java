@@ -5,7 +5,6 @@ import java.io.OutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.nio.ByteBuffer;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -130,7 +129,11 @@ public class Main {
           // resPayload.write(new byte[]{0, 0, 0, 0, 0, 0, 0, 0}); // aborted producer id
           // resPayload.write(new byte[]{0, 0, 0, 0, 0, 0, 0, 0}); // aborted first offset
           resPayload.write(new byte[]{0, 0, 0, 0}); // preferred read replica
-          resPayload.write(getPartition(topicUUID, partition.partitionId));
+          List<byte[]> records = getRecords(topicUUID, partition.partitionId);
+          Utils.putUnsignedVarInt(resPayload, records.size() + 1);
+          for (byte[] record : records) {
+            resPayload.write(record);
+          }
           resPayload.write((byte) 0); // tag buffer - partition
         }
       }
@@ -212,10 +215,10 @@ public class Main {
     resPayload.write(new byte[]{0}); // tag buffer
   }
 
-  static byte[] getPartition(byte[] topicUUID, byte[] partitionId) throws IOException {
+  static List<byte[]> getRecords(byte[] topicUUID, byte[] partitionId) throws IOException {
     String topicName = Metadata.getInstance().findTopicName(topicUUID);
     int partitionIndex = ByteBuffer.wrap(partitionId).getInt();
     TopicPartitionFile file = new TopicPartitionFile(topicName, partitionIndex);
-    return file.getData();
+    return file.getRecords();
   }
 }

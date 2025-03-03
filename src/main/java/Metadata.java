@@ -59,7 +59,7 @@ class Metadata {
 
   // FYI not thread safe, but fine for this single thread reading from file
   static void readMetadataLog() throws IOException {
-    System.out.println("Attempting to read: " + Main.KAFKA_CLUSTER_METADATA_LOG_PATH);
+    System.out.println("Reading: " + Main.KAFKA_CLUSTER_METADATA_LOG_PATH);
     ByteBuffer src;
     try (InputStream is = new FileInputStream(Main.KAFKA_CLUSTER_METADATA_LOG_PATH)) {
       src = ByteBuffer.wrap(is.readAllBytes());
