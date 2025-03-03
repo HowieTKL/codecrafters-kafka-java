@@ -151,7 +151,7 @@ public class Metadata {
     // update index
     UUID uuid = UUID.nameUUIDFromBytes(recordValue.topicUUID);
     topicUUID2Name.put(uuid, recordValue.topicName);
-    LOG.debug("topicName={} topicUUID={}", recordValue.topicName, uuid);
+    LOG.debug("topicName={} topicUUID={}", recordValue.topicName, Utils.bytesToHex(recordValue.topicUUID));
 
     return recordValue;
   }
@@ -161,8 +161,7 @@ public class Metadata {
     recordValue.version = src.get();
     src.get(recordValue.partitionId);
     src.get(recordValue.topicUUID);
-    LOG.debug("partitionId={} topicUUID={}",
-        ByteBuffer.wrap(recordValue.partitionId).getInt(), Utils.bytesToHex(recordValue.topicUUID));
+    LOG.debug("partitionId={} topicUUID={}", ByteBuffer.wrap(recordValue.partitionId).getInt(), Utils.bytesToHex(recordValue.topicUUID));
 
     parseCompactArray(src, 4, recordValue.replicaArray);
     parseCompactArray(src, 4, recordValue.inSyncReplicaArray);
