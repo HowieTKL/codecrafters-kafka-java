@@ -1,32 +1,33 @@
+package org.howietkl.kafka;
+
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 
-class Utils {
+public class Utils {
 
-  static void putCompactString(OutputStream out, String string) throws IOException {
+  public static void putCompactString(OutputStream out, String string) throws IOException {
     putUnsignedVarInt(out, string.length() + 1);
     out.write(string.getBytes(StandardCharsets.UTF_8));
   }
 
-  static String getCompactString(ByteBuffer src) throws IOException {
+  public static String getCompactString(ByteBuffer src) throws IOException {
     int size = getUnsignedVarInt(src) - 1;
     byte[] stringBytes = new byte[size];
     src.get(stringBytes);
     return new String(stringBytes, StandardCharsets.UTF_8);
   }
 
-  static void putCompactArray(OutputStream out, List<byte[]> array) throws IOException {
+  public static void putCompactArray(OutputStream out, List<byte[]> array) throws IOException {
     putUnsignedVarInt(out, array.size() + 1);
     for (byte[] a : array) {
       out.write(a);
     }
   }
 
-  static int getSignedVarInt(ByteBuffer src) throws IOException {
+  public static int getSignedVarInt(ByteBuffer src) throws IOException {
     int value = getUnsignedVarInt(src);
     return (value >>> 1) ^ -(value & 1);
   }
@@ -34,7 +35,7 @@ class Utils {
   /* Adapted from
    * https://github.com/bazelbuild/bazel/blob/master/src/main/java/com/google/devtools/build/lib/util/VarInt.java
    */
-  static int getUnsignedVarInt(ByteBuffer src) throws IOException {
+  public static int getUnsignedVarInt(ByteBuffer src) throws IOException {
     int tmp;
     if ((tmp = src.get()) >= 0) {
       return tmp;
@@ -61,7 +62,7 @@ class Utils {
     }
     return result;
   }
-  static void putUnsignedVarInt(OutputStream outputStream, int v) throws IOException {
+  public static void putUnsignedVarInt(OutputStream outputStream, int v) throws IOException {
     byte[] bytes = new byte[unsignedVarIntSize(v)];
     putUnsignedVarInt(v, bytes, 0);
     outputStream.write(bytes);
@@ -85,7 +86,7 @@ class Utils {
     return result;
   }
 
-  static String bytesToHex(byte[] bytes) {
+  public static String bytesToHex(byte[] bytes) {
     StringBuilder hexString = new StringBuilder();
     for (byte b : bytes) {
       String hex = String.format("%02x", b);

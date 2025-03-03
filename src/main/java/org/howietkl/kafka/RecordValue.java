@@ -1,3 +1,5 @@
+package org.howietkl.kafka;
+
 public abstract class RecordValue {
   /*
 - Value

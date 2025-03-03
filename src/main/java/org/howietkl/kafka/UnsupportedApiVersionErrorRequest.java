@@ -1,5 +1,4 @@
-import java.io.IOException;
-import java.nio.ByteBuffer;
+package org.howietkl.kafka;
 
 public class UnsupportedApiVersionErrorRequest extends Request {
 }

@@ -1,3 +1,5 @@
+package org.howietkl.kafka;
+
 public class Record {
     /*
 - Length: varint

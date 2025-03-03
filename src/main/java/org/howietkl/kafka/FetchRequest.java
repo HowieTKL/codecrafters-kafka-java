@@ -1,16 +1,18 @@
+package org.howietkl.kafka;
+
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
 
 public class FetchRequest extends Request {
-  List<byte[]> topicUUIDs = new ArrayList<>();
-  List<Integer> partitions = new ArrayList<>();
+  public List<byte[]> topicUUIDs = new ArrayList<>();
+  public List<Integer> partitions = new ArrayList<>();
 
   @Override
-  void parseRequest(ByteBuffer reqPayload) throws IOException {
+  public void parseRequest(ByteBuffer reqPayload) throws IOException {
     /*
-Fetch Request (Version: 16) => max_wait_ms min_bytes max_bytes isolation_level session_id session_epoch [topics] [forgotten_topics_data] rack_id TAG_BUFFER
+Fetch org.howietkl.kafka.Request (Version: 16) => max_wait_ms min_bytes max_bytes isolation_level session_id session_epoch [topics] [forgotten_topics_data] rack_id TAG_BUFFER
   max_wait_ms => INT32
   min_bytes => INT32
   max_bytes => INT32
@@ -31,7 +33,7 @@ Fetch Request (Version: 16) => max_wait_ms min_bytes max_bytes isolation_level s
     partitions => INT32
   rack_id => COMPACT_STRING
      */
-    System.out.println("parsing FetchRequest");
+    System.out.println("parsing org.howietkl.kafka.FetchRequest");
     reqPayload.getInt(); // max_wait_ms
     reqPayload.getInt(); // min_bytes
     reqPayload.getInt(); // max_bytes

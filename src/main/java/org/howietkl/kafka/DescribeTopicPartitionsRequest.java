@@ -1,3 +1,5 @@
+package org.howietkl.kafka;
+
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
@@ -5,11 +7,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class DescribeTopicPartitionsRequest extends Request {
-  List<String> topicNames = new ArrayList<>();
+  public List<String> topicNames = new ArrayList<>();
 
   @Override
-  void parseRequest(ByteBuffer src) throws IOException {
-    System.out.println("parsing DescribeTopicPartitionsRequest");
+  public void parseRequest(ByteBuffer src) throws IOException {
+    System.out.println("parsing org.howietkl.kafka.DescribeTopicPartitionsRequest");
     parseCompactArrayTopicNames(src);
   }
 

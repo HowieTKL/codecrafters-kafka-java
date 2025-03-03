@@ -1,6 +1,8 @@
+package org.howietkl.kafka;
+
 public class TopicRecordValue extends RecordValue {
 /*
-↓ Value (Topic Record)
+↓ Value (Topic org.howietkl.kafka.Record)
 - Frame Version
 - Type
 - Version

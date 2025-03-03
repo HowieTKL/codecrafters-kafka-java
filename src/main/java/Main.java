@@ -1,3 +1,5 @@
+import org.howietkl.kafka.*;
+
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -5,7 +7,6 @@ import java.io.OutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.nio.ByteBuffer;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
@@ -15,23 +16,10 @@ public class Main {
   private static final int PORT = 9092;
   private static final int THREADS = 4;
 
-  static final String KAFKA_CLUSTER_METADATA_LOG_PATH = "/tmp/kraft-combined-logs/__cluster_metadata-0/00000000000000000000.log";
-  static final String KAFKA_TOPIC_PARTITION_LOG_PATH = "/tmp/kraft-combined-logs/%s-%d/00000000000000000000.log"; // %s= topic name, %d=partition index
-
-  static final short API_KEY_FETCH = 1;
-  static final short API_KEY_API_VERSIONS = 18;
-  static final short API_KEY_DESCRIBE_TOPIC_PARTITIONS = 75;
-
-  static final int OFFSET_API_KEY = 0;
-  static final int OFFSET_API_VERSION = 2;
-  static final int OFFSET_CORRELATION_ID = 4;
-  static final int OFFSET_CLIENT_ID_SIZE = 8;
-  static final int OFFSET_CLIENT_ID = 10;
-
-  static final byte[] ERR_UNSUPPORTED_VERSION = new byte[]{0, 35};
-  static final byte[] ERR_NONE = new byte[]{0, 0};
-  static final byte[] ERR_UNKNOWN_TOPIC_OR_PARTITION = new byte[]{0, 3};
-  static final byte[] ERR_UNKNOWN_TOPIC = new byte[]{0, 100};
+  public static final byte[] ERR_UNSUPPORTED_VERSION = new byte[]{0, 35};
+  public static final byte[] ERR_NONE = new byte[]{0, 0};
+  public static final byte[] ERR_UNKNOWN_TOPIC_OR_PARTITION = new byte[]{0, 3};
+  public static final byte[] ERR_UNKNOWN_TOPIC = new byte[]{0, 100};
 
   public static void main(String[] args) {
     // You can use print statements as follows for debugging, they'll be visible when running tests.
@@ -148,15 +136,15 @@ public class Main {
     System.out.println("handleRequest API_KEY_API_VERSIONS");
     resPayload.write(ERR_NONE);
     resPayload.write(4); // num_api_keys + 1
-    resPayload.write(ByteBuffer.allocate(2).putShort(API_KEY_API_VERSIONS).array());
+    resPayload.write(ByteBuffer.allocate(2).putShort(Request.API_KEY_API_VERSIONS).array());
     resPayload.write(new byte[]{0, 0}); // min version
     resPayload.write(new byte[]{0, 4}); // max version
     resPayload.write(0); // tag buffer
-    resPayload.write(ByteBuffer.allocate(2).putShort(API_KEY_DESCRIBE_TOPIC_PARTITIONS).array());
+    resPayload.write(ByteBuffer.allocate(2).putShort(Request.API_KEY_DESCRIBE_TOPIC_PARTITIONS).array());
     resPayload.write(new byte[]{0, 0}); // min version
     resPayload.write(new byte[]{0, 0}); // max version
     resPayload.write(0); // tag buffer
-    resPayload.write(ByteBuffer.allocate(2).putShort(API_KEY_FETCH).array());
+    resPayload.write(ByteBuffer.allocate(2).putShort(Request.API_KEY_FETCH).array());
     resPayload.write(new byte[]{0, 0}); // min version
     resPayload.write(new byte[]{0, 16}); // max version
     resPayload.write(0); // tag buffer

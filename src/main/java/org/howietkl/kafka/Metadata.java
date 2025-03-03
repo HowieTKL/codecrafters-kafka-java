@@ -1,12 +1,16 @@
+package org.howietkl.kafka;
+
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.util.*;
 
-class Metadata {
+public class Metadata {
+  public static final String KAFKA_CLUSTER_METADATA_LOG_PATH = "/tmp/kraft-combined-logs/__cluster_metadata-0/00000000000000000000.log";
+
   private static final Metadata instance = new Metadata();
-  private static final List<RecordBatch> recordBatches = new ArrayList<>();
+  public static final List<RecordBatch> recordBatches = new ArrayList<>();
   private static final Map<UUID, String> topicUUID2Name = new HashMap<>();
 
   static {
@@ -20,11 +24,11 @@ class Metadata {
   private Metadata() {
   }
 
-  static Metadata getInstance() {
+  public static Metadata getInstance() {
     return instance;
   }
 
-  byte[] findTopicUUID(String topicName) {
+  public byte[] findTopicUUID(String topicName) {
     for (RecordBatch recordBatch : recordBatches) {
       for (Record record : recordBatch.records) {
         if (record.recordValue.getType() == TopicRecordValue.TYPE) {
@@ -38,7 +42,7 @@ class Metadata {
     return null;
   }
 
-  List<PartitionRecordValue> findPartitionRecordValues(byte[] topicUUID) {
+  public List<PartitionRecordValue> findPartitionRecordValues(byte[] topicUUID) {
     List<PartitionRecordValue> partitionRecordValues = new ArrayList<>();
     for (RecordBatch recordBatch : recordBatches) {
       for (Record record : recordBatch.records) {
@@ -53,15 +57,15 @@ class Metadata {
     return partitionRecordValues;
   }
 
-  String findTopicName(byte[] topicUUID) {
+  public String findTopicName(byte[] topicUUID) {
     return topicUUID2Name.get(UUID.nameUUIDFromBytes(topicUUID));
   }
 
   // FYI not thread safe, but fine for this single thread reading from file
-  static void readMetadataLog() throws IOException {
-    System.out.println("Reading: " + Main.KAFKA_CLUSTER_METADATA_LOG_PATH);
+  private static void readMetadataLog() throws IOException {
+    System.out.println("Reading: " + KAFKA_CLUSTER_METADATA_LOG_PATH);
     ByteBuffer src;
-    try (InputStream is = new FileInputStream(Main.KAFKA_CLUSTER_METADATA_LOG_PATH)) {
+    try (InputStream is = new FileInputStream(KAFKA_CLUSTER_METADATA_LOG_PATH)) {
       src = ByteBuffer.wrap(is.readAllBytes());
     }
     while (src.hasRemaining()) {
@@ -69,7 +73,7 @@ class Metadata {
     }
   }
 
-  static RecordBatch getRecordBatch(ByteBuffer src) throws IOException {
+  private static RecordBatch getRecordBatch(ByteBuffer src) throws IOException {
     System.out.println("Parsing record batch");
     RecordBatch recBatch = new RecordBatch();
     src.get(recBatch.baseOffset);
@@ -89,7 +93,7 @@ class Metadata {
     return recBatch;
   }
 
-  static List<Record> getRecords(ByteBuffer src) throws IOException {
+  private static List<Record> getRecords(ByteBuffer src) throws IOException {
     System.out.println("Parsing records");
     List<Record> records = new ArrayList<>();
     int numRecords = src.getInt();
@@ -99,7 +103,7 @@ class Metadata {
     return records;
   }
 
-  static Record getRecord(ByteBuffer src) throws IOException {
+  private static Record getRecord(ByteBuffer src) throws IOException {
     System.out.println("Parsing record");
     Record record = new Record();
     record.length = Utils.getSignedVarInt(src);
@@ -135,8 +139,8 @@ System.out.println("record value type: " + type);
     return record;
   }
 
-  static TopicRecordValue getTopicRecordValue(ByteBuffer src) throws IOException {
-    System.out.println("   TopicRecordValue");
+  private static TopicRecordValue getTopicRecordValue(ByteBuffer src) throws IOException {
+    System.out.println("   org.howietkl.kafka.TopicRecordValue");
     TopicRecordValue recordValue = new TopicRecordValue();
     recordValue.version = src.get();
     recordValue.topicName = Utils.getCompactString(src);
@@ -152,8 +156,8 @@ System.out.println("record value type: " + type);
     return recordValue;
   }
 
-  static PartitionRecordValue getPartitionRecordValue(ByteBuffer src) throws IOException {
-    System.out.println("   PartitionRecordValue");
+  private static PartitionRecordValue getPartitionRecordValue(ByteBuffer src) throws IOException {
+    System.out.println("   org.howietkl.kafka.PartitionRecordValue");
     PartitionRecordValue recordValue = new PartitionRecordValue();
     recordValue.version = src.get();
     src.get(recordValue.partitionId);
@@ -208,8 +212,8 @@ System.out.println("record value type: " + type);
     return recordValue;
   }
 
-  static FeatureLevelRecordValue getFeatureLevelRecordValue(ByteBuffer src) throws IOException {
-    System.out.println("   FeatureLevelRecordValue");
+  private static FeatureLevelRecordValue getFeatureLevelRecordValue(ByteBuffer src) throws IOException {
+    System.out.println("   org.howietkl.kafka.FeatureLevelRecordValue");
     return new FeatureLevelRecordValue();
     // todo
   }

@@ -1,15 +1,20 @@
-import java.io.ByteArrayOutputStream;
+package org.howietkl.kafka;
+
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 
 public abstract class Request {
-  byte[] correlationId;
-  short requestApiKey;
-  short requestApiVersion;
-  String clientId;
+  public static final short API_KEY_FETCH = 1;
+  public static final short API_KEY_API_VERSIONS = 18;
+  public static final short API_KEY_DESCRIBE_TOPIC_PARTITIONS = 75;
 
-  static Request parseRequestHeader(ByteBuffer reqPayload) throws IOException {
+  public byte[] correlationId;
+  public short requestApiKey;
+  public short requestApiVersion;
+  public String clientId;
+
+  public static Request parseRequestHeader(ByteBuffer reqPayload) throws IOException {
     Request request;
     short requestApiKey = reqPayload.getShort();
     short requestApiVersion = reqPayload.getShort();
@@ -18,15 +23,15 @@ public abstract class Request {
     String clientId = getClientId(reqPayload);
     reqPayload.get(); // tag buffer
 
-    if (requestApiKey == Main.API_KEY_API_VERSIONS) {
+    if (requestApiKey == API_KEY_API_VERSIONS) {
       if (requestApiVersion < 0 || requestApiVersion > 4) {
         request = new UnsupportedApiVersionErrorRequest();
       } else {
         request = new ApiVersionsRequest();
       }
-    } else if (requestApiKey == Main.API_KEY_DESCRIBE_TOPIC_PARTITIONS) {
+    } else if (requestApiKey == API_KEY_DESCRIBE_TOPIC_PARTITIONS) {
       request = new DescribeTopicPartitionsRequest();
-    } else if (requestApiKey == Main.API_KEY_FETCH) {
+    } else if (requestApiKey == API_KEY_FETCH) {
       request = new FetchRequest();
     } else {
       throw new IllegalArgumentException("Unknown request api key");
@@ -41,10 +46,10 @@ public abstract class Request {
     return request;
   }
 
-  void parseRequest(ByteBuffer reqPayload) throws IOException {
+  public void parseRequest(ByteBuffer reqPayload) throws IOException {
   }
 
-  static String getClientId(ByteBuffer reqPayload) {
+  public static String getClientId(ByteBuffer reqPayload) {
     short clientIdSize = reqPayload.getShort();
     byte[] clientIdBytes = new byte[clientIdSize];
     reqPayload.get(clientIdBytes);

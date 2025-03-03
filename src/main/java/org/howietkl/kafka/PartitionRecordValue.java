@@ -1,9 +1,11 @@
+package org.howietkl.kafka;
+
 import java.util.ArrayList;
 import java.util.List;
 
 public class PartitionRecordValue extends RecordValue {
   /*
-- Value (Partition Record)
+- Value (Partition org.howietkl.kafka.Record)
   - Partition ID
   - Topic UUID
   - Length of replica array
@@ -20,14 +22,14 @@ public class PartitionRecordValue extends RecordValue {
   - Tagged Fields Count
    */
   static final byte TYPE = 0x3; // 3
-  byte[] partitionId = new byte[4];
-  byte[] topicUUID = new byte[16];
-  List<byte[]> replicaArray = new ArrayList<>(); // 4-bytes each
-  List<byte[]> inSyncReplicaArray = new ArrayList<>(); // 4-bytes each
+  public byte[] partitionId = new byte[4];
+  public byte[] topicUUID = new byte[16];
+  public List<byte[]> replicaArray = new ArrayList<>(); // 4-bytes each
+  public List<byte[]> inSyncReplicaArray = new ArrayList<>(); // 4-bytes each
   List<byte[]> removingReplicasArray = new ArrayList<>(); // 4-bytes each
   List<byte[]> addingReplicasArray = new ArrayList<>(); // 4-bytes each
-  byte[] leader = new byte[4]; // 4-bytes
-  byte[] leaderEpoch = new byte[4]; // 4-bytes
+  public byte[] leader = new byte[4]; // 4-bytes
+  public byte[] leaderEpoch = new byte[4]; // 4-bytes
   byte[] partitionEpoch = new byte[4]; // 4-bytes
   List<byte[]> directoriesArray = new ArrayList<>(); // 16-bytes directory UUIDs
   int taggedFieldsCount; // varint unsigned
