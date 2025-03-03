@@ -146,12 +146,12 @@ public class Metadata {
     recordValue.version = src.get();
     recordValue.topicName = Utils.getCompactString(src);
     src.get(recordValue.topicUUID);
-    LOG.debug("topicName={} topicUUID={}", recordValue.topicName, Utils.bytesToHex(recordValue.topicUUID));
     recordValue.taggedFieldsCount = Utils.getUnsignedVarInt(src);
 
     // update index
     UUID uuid = UUID.nameUUIDFromBytes(recordValue.topicUUID);
-    topicUUID2Name.put(UUID.nameUUIDFromBytes(recordValue.topicUUID), recordValue.topicName);
+    topicUUID2Name.put(uuid, recordValue.topicName);
+    LOG.debug("topicName={} topicUUID={}", recordValue.topicName, uuid);
 
     return recordValue;
   }
