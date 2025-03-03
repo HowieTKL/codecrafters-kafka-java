@@ -1,7 +1,9 @@
-import org.howietkl.kafka.*;
+import org.howietkl.kafka.TopicPartitionFile;
+import org.howietkl.kafka.Utils;
 import org.howietkl.kafka.metadata.Metadata;
 import org.howietkl.kafka.metadata.PartitionRecordValue;
 import org.howietkl.kafka.request.*;
+import org.howietkl.kafka.response.UnsupportedApiVersionErrorResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -71,15 +73,13 @@ public class Main {
     }
   }
 
-  static void handleRequest(ByteBuffer reqPayload, ByteArrayOutputStream resPayload) throws IOException {
+  static void handleRequest(ByteBuffer reqPayload, OutputStream resPayload) throws IOException {
     Request request = Request.parseRequestHeader(reqPayload);
     request.parseRequest(reqPayload);
     resPayload.write(request.correlationId);
     switch (request) {
-      case UnsupportedApiVersionErrorRequest unsupportedApiVersionErrorRequest -> {
-        resPayload.write(ERR_UNSUPPORTED_VERSION);
-        LOG.info("35(ERR_UNSUPPORTED_VERSION)");
-      }
+      case UnsupportedApiVersionErrorRequest unsupportedApiVersionErrorRequest ->
+        new UnsupportedApiVersionErrorResponse().processResponse(unsupportedApiVersionErrorRequest, resPayload);
       case ApiVersionsRequest apiVersionsRequest ->
           handleApiVersions(apiVersionsRequest, resPayload);
       case DescribeTopicPartitionsRequest describeTopicPartitionsRequest ->
@@ -93,7 +93,7 @@ public class Main {
     }
   }
 
-  static void handleFetch(FetchRequest request, ByteArrayOutputStream resPayload) throws IOException {
+  static void handleFetch(FetchRequest request, OutputStream resPayload) throws IOException {
     LOG.debug("handleRequest API_KEY_FETCH");
     resPayload.write(0); // tag buffer
     resPayload.write(new byte[]{0, 0, 0, 0}); // throttle time
@@ -142,7 +142,7 @@ public class Main {
     resPayload.write((byte) 0); // tag buffer
   }
 
-  static void handleApiVersions(ApiVersionsRequest request, ByteArrayOutputStream resPayload) throws IOException {
+  static void handleApiVersions(ApiVersionsRequest request, OutputStream resPayload) throws IOException {
     LOG.debug("handleRequest API_KEY_API_VERSIONS");
     resPayload.write(ERR_NONE);
     resPayload.write(4); // num_api_keys + 1
@@ -162,7 +162,7 @@ public class Main {
     resPayload.write(0); // tag buffer
   }
 
-  static void handleDescribeTopicPartitions(DescribeTopicPartitionsRequest request, ByteArrayOutputStream resPayload) throws IOException {
+  static void handleDescribeTopicPartitions(DescribeTopicPartitionsRequest request, OutputStream resPayload) throws IOException {
     LOG.debug("handleRequest API_KEY_DESCRIBE_TOPIC_PARTITIONS");
     resPayload.write(new byte[]{0}); // tag buffer
     resPayload.write(new byte[]{0,0,0,0}); // throttle time
