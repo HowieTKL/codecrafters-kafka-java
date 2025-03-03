@@ -97,13 +97,19 @@ public class Main {
     resPayload.write(0); // tag buffer
     resPayload.write(new byte[]{0, 0, 0, 0}); // throttle time
     resPayload.write(ERR_NONE);
-    resPayload.write(new byte[] {0, 0, 0, 0}); // session id
-    resPayload.write((byte)1); // responses=1
-    resPayload.write(request.topicUUIDs.getFirst());
-    resPayload.write((byte)1); // partitions=1
-    resPayload.write(new byte[] {0, 0, 0, 0}); // partition index
-    resPayload.write(ERR_UNKNOWN_TOPIC);
-    resPayload.write((byte)0); // tag buffer
+    resPayload.write(new byte[]{0, 0, 0, 0}); // session id
+    resPayload.write((byte) 1); // responses=1
+    Utils.putUnsignedVarInt(resPayload, request.topicUUIDs.size() + 1);
+    for (int i = 0; i < request.topicUUIDs.size(); i++) {
+      byte[] topicUUID = request.topicUUIDs.get(i);
+      resPayload.write(topicUUID);
+      List<PartitionRecordValue> partitions = Metadata.getInstance().findPartitionRecordValues(topicUUID);
+      // TODO
+    resPayload.write((byte) 2); // partitions=1
+      resPayload.write(new byte[]{0, 0, 0, 0}); // partition index
+      resPayload.write(ERR_UNKNOWN_TOPIC);
+      resPayload.write((byte) 0); // tag buffer
+    }
   }
 
   static void handleApiVersions(ApiVersionsRequest  request, ByteArrayOutputStream resPayload) throws IOException {
