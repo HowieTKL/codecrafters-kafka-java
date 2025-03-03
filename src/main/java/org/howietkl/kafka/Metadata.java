@@ -164,51 +164,25 @@ public class Metadata {
     LOG.debug("partitionId={} topicUUID={}",
         ByteBuffer.wrap(recordValue.partitionId).getInt(), Utils.bytesToHex(recordValue.topicUUID));
 
-    {
-      int replicaArrayLength = Utils.getUnsignedVarInt(src) - 1;
-      for (int i = 0; i < replicaArrayLength; i++) {
-        byte[] replicaArray = new byte[4];
-        src.get(replicaArray);
-        recordValue.replicaArray.add(replicaArray);
-      }
-    }
-    {
-      int inSyncReplicaArrayLength = Utils.getUnsignedVarInt(src) - 1;
-      for (int i = 0; i < inSyncReplicaArrayLength; i++) {
-        byte[] inSyncReplicaArray = new byte[4];
-        src.get(inSyncReplicaArray);
-        recordValue.inSyncReplicaArray.add(inSyncReplicaArray);
-      }
-    }
-    {
-      int removingReplicasArrayLength = Utils.getUnsignedVarInt(src) - 1;
-      for (int i = 0; i < removingReplicasArrayLength; i++) {
-        byte[] removingReplicasArray = new byte[4];
-        src.get(removingReplicasArray);
-        recordValue.removingReplicasArray.add(removingReplicasArray);
-      }
-    }
-    {
-      int addingReplicasArrayLength = Utils.getUnsignedVarInt(src) - 1;
-      for (int i = 0; i < addingReplicasArrayLength; i++) {
-        byte[] addingReplicasArray = new byte[4];
-        src.get(addingReplicasArray);
-        recordValue.addingReplicasArray.add(addingReplicasArray);
-      }
-    }
+    parseCompactArray(src, 4, recordValue.replicaArray);
+    parseCompactArray(src, 4, recordValue.inSyncReplicaArray);
+    parseCompactArray(src, 4, recordValue.removingReplicasArray);
+    parseCompactArray(src, 4, recordValue.addingReplicasArray);
     src.get(recordValue.leader);
     src.get(recordValue.leaderEpoch);
     src.get(recordValue.partitionEpoch);
-    {
-      int directoriesArrayLength = Utils.getUnsignedVarInt(src) - 1;
-      for (int i = 0; i < directoriesArrayLength; i++) {
-        byte[] directoriesArray = new byte[16];
-        src.get(directoriesArray);
-        recordValue.directoriesArray.add(directoriesArray);
-      }
-    }
+    parseCompactArray(src, 16, recordValue.directoriesArray);
     recordValue.taggedFieldsCount = Utils.getUnsignedVarInt(src);
     return recordValue;
+  }
+
+  private static void parseCompactArray(ByteBuffer src, int x, List<byte[]> array) throws IOException {
+    int arrayLength = Utils.getUnsignedVarInt(src) - 1;
+    for (int i = 0; i < arrayLength; i++) {
+      byte[] replicaArray = new byte[x];
+      src.get(replicaArray);
+      array.add(replicaArray);
+    }
   }
 
   private static FeatureLevelRecordValue getFeatureLevelRecordValue(ByteBuffer src) throws IOException {
