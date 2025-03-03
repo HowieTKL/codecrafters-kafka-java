@@ -6,9 +6,10 @@ import java.util.*;
 
 class Metadata {
   static final Metadata instance = new Metadata();
+  private static Map<UUID, String> topicUUID2Name = new HashMap<>();
+
 
   private List<RecordBatch> recordBatches;
-  private static final Map<UUID, String> topicUUID2Name = new HashMap<>();
 
   private Metadata() {
     try {
@@ -147,6 +148,9 @@ System.out.println("record value type: " + type);
 
     // update index
     UUID uuid = UUID.nameUUIDFromBytes(recordValue.topicUUID);
+    if (topicUUID2Name == null) {
+      topicUUID2Name = new HashMap<>();
+    }
     topicUUID2Name.put(UUID.nameUUIDFromBytes(recordValue.topicUUID), recordValue.topicName);
 
     return recordValue;
