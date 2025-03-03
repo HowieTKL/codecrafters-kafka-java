@@ -103,8 +103,7 @@ public class Main {
       byte[] topicUUID = request.topicUUIDs.get(i);
       resPayload.write(topicUUID);
       List<PartitionRecordValue> partitions = Metadata.getInstance().findPartitionRecordValues(topicUUID);
-      // TODO
-    resPayload.write((byte) 2); // partitions=1
+      resPayload.write((byte) 2); // partitions=1
       resPayload.write(new byte[]{0, 0, 0, 0}); // partition index
       resPayload.write(ERR_UNKNOWN_TOPIC);
       resPayload.write(new byte[]{0, 0, 0, 0, 0, 0, 0, 0}); // high watermark
@@ -115,10 +114,11 @@ public class Main {
       // resPayload.write(new byte[]{0, 0, 0, 0, 0, 0, 0, 0}); // aborted first offset
       resPayload.write(new byte[]{0, 0, 0, 0}); // preferred read replica
       Utils.putUnsignedVarInt(resPayload, 0); // varint records
-      resPayload.write((byte) 0); // tag buffer
-      resPayload.write((byte) 0); // tag buffer
-      resPayload.write((byte) 0); // tag buffer
+      resPayload.write((byte) 0); // tag buffer - partition
+
+      resPayload.write((byte) 0); // tag buffer - topic
     }
+    resPayload.write((byte) 0); // tag buffer
   }
 
   static void handleApiVersions(ApiVersionsRequest  request, ByteArrayOutputStream resPayload) throws IOException {
