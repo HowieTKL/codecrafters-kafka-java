@@ -117,7 +117,7 @@ public class Main {
       resPayload.write(new byte[]{0, 0, 0, 0}); // preferred read replica
       Utils.putUnsignedVarInt(resPayload, 0); // varint records
       resPayload.write((byte) 0); // tag buffer
-
+      resPayload.write((byte) 0); // tag buffer
       resPayload.write((byte) 0); // tag buffer
     }
   }
