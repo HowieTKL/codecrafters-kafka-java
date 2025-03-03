@@ -4,17 +4,23 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public abstract class Request {
   public static final short API_KEY_FETCH = 1;
+
   public static final short API_KEY_API_VERSIONS = 18;
   public static final short API_KEY_DESCRIBE_TOPIC_PARTITIONS = 75;
+
+  public static final Logger LOG = LoggerFactory.getLogger(Request.class);
 
   public byte[] correlationId;
   public short requestApiKey;
   public short requestApiVersion;
   public String clientId;
 
-  public static Request parseRequestHeader(ByteBuffer reqPayload) throws IOException {
+  public static Request parseRequestHeader(ByteBuffer reqPayload) {
     Request request;
     short requestApiKey = reqPayload.getShort();
     short requestApiVersion = reqPayload.getShort();
@@ -34,19 +40,20 @@ public abstract class Request {
     } else if (requestApiKey == API_KEY_FETCH) {
       request = new FetchRequest();
     } else {
-      throw new IllegalArgumentException("Unknown request api key");
+      LOG.error("Unsupported request api key={}", requestApiKey);
+      throw new UnsupportedOperationException("Unsupported request api key=" + requestApiKey);
     }
     request.requestApiKey = requestApiKey;
     request.requestApiVersion = requestApiVersion;
     request.clientId = clientId;
     request.correlationId = correlationId;
-
-    System.out.println("request clientId=" + clientId);
-    System.out.println("request correlationId=" + Utils.bytesToHex(correlationId));
+    LOG.debug("requestApiKey={}({}) requestApiVersion={} clientId={} correlationId={}",
+        requestApiKey, request.getClass().getSimpleName(), requestApiVersion, clientId, Utils.bytesToHex(correlationId));
     return request;
   }
 
   public void parseRequest(ByteBuffer reqPayload) throws IOException {
+    LOG.debug("Parsing request from {}", getClass().getSimpleName());
   }
 
   public static String getClientId(ByteBuffer reqPayload) {

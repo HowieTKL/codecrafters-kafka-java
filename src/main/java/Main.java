@@ -1,4 +1,6 @@
 import org.howietkl.kafka.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -21,6 +23,8 @@ public class Main {
   public static final byte[] ERR_UNKNOWN_TOPIC_OR_PARTITION = new byte[]{0, 3};
   public static final byte[] ERR_UNKNOWN_TOPIC = new byte[]{0, 100};
 
+  public static final Logger LOG = LoggerFactory.getLogger(Main.class);
+
   public static void main(String[] args) {
     // You can use print statements as follows for debugging, they'll be visible when running tests.
     System.err.println("Logs from your program will appear here!");
@@ -31,19 +35,17 @@ public class Main {
       // ensures that we don't run into 'Address already in use' errors
       serverSocket.setReuseAddress(true);
       while (true) {
-        System.out.println("main waiting for clients");
+        LOG.info("Server port={} waiting for connection...", PORT);
         // Wait for connection from client.
         Socket clientSocket = serverSocket.accept();
         executorService.submit(() -> handleRequest(clientSocket));
       }
     } catch (Exception e) {
-      e.printStackTrace();
+      LOG.error(e.getMessage(), e);
     }
-    System.out.println("main system terminated");
   }
 
   static void handleRequest(Socket clientSocket) {
-    System.out.println("handleRequest");
     try (clientSocket) {
       InputStream in = clientSocket.getInputStream();
       while (true) {
@@ -52,7 +54,7 @@ public class Main {
           break;
         }
         int messageSize = ByteBuffer.wrap(messageSizeBytes).getInt();
-        System.out.println("handleRequest messageSize=" + messageSize);
+        LOG.info("Message size={} bytes", messageSize);
         ByteBuffer reqPayload = ByteBuffer.wrap(in.readNBytes(messageSize));
         ByteArrayOutputStream resPayload = new ByteArrayOutputStream();
         handleRequest(reqPayload, resPayload);
@@ -60,10 +62,9 @@ public class Main {
         out.write(ByteBuffer.allocate(4).putInt(resPayload.size()).array()); // message/payload size
         out.write(resPayload.toByteArray());
         out.flush();
-        System.out.println("handleRequest flushed response");
       }
     } catch (Exception e) {
-      e.printStackTrace();
+      LOG.error(e.getMessage(), e);
     }
   }
 
@@ -73,18 +74,21 @@ public class Main {
     resPayload.write(request.correlationId);
     if (request instanceof UnsupportedApiVersionErrorRequest) {
       resPayload.write(ERR_UNSUPPORTED_VERSION);
-      System.out.println("handleRequest ERR_UNSUPPORTED_VERSION");
+      LOG.info("35(ERR_UNSUPPORTED_VERSION)");
     } else if (request instanceof ApiVersionsRequest) {
       handleApiVersions((ApiVersionsRequest) request, resPayload);
     } else if (request instanceof DescribeTopicPartitionsRequest) {
       handleDescribeTopicPartitions((DescribeTopicPartitionsRequest) request, resPayload);
     } else if (request instanceof FetchRequest) {
       handleFetch((FetchRequest) request, resPayload);
+    } else {
+      LOG.error("Unsupported request type={}", request.getClass().getName());
+      throw new UnsupportedOperationException("Unknown request type: " + request);
     }
   }
 
   static void handleFetch(FetchRequest request, ByteArrayOutputStream resPayload) throws IOException {
-    System.out.println("handleRequest API_KEY_FETCH");
+    LOG.debug("handleRequest API_KEY_FETCH");
     resPayload.write(0); // tag buffer
     resPayload.write(new byte[]{0, 0, 0, 0}); // throttle time
     resPayload.write(ERR_NONE);
@@ -133,7 +137,7 @@ public class Main {
   }
 
   static void handleApiVersions(ApiVersionsRequest  request, ByteArrayOutputStream resPayload) throws IOException {
-    System.out.println("handleRequest API_KEY_API_VERSIONS");
+    LOG.debug("handleRequest API_KEY_API_VERSIONS");
     resPayload.write(ERR_NONE);
     resPayload.write(4); // num_api_keys + 1
     resPayload.write(ByteBuffer.allocate(2).putShort(Request.API_KEY_API_VERSIONS).array());
@@ -153,11 +157,10 @@ public class Main {
   }
 
   static void handleDescribeTopicPartitions(DescribeTopicPartitionsRequest request, ByteArrayOutputStream resPayload) throws IOException {
-    System.out.println("handleDescribeTopicPartitions");
+    LOG.debug("handleRequest API_KEY_DESCRIBE_TOPIC_PARTITIONS");
     resPayload.write(new byte[]{0}); // tag buffer
     resPayload.write(new byte[]{0,0,0,0}); // throttle time
 
-    System.out.println(" topics=" + request.topicNames.toString());
     // topics
     Utils.putUnsignedVarInt(resPayload, request.topicNames.size() + 1); // compact array size
     // for each topic
@@ -206,7 +209,7 @@ public class Main {
   }
 
   static List<byte[]> getRecords(byte[] topicUUID, int partitionId) throws IOException {
-    System.out.println("getRecords topicUUID=" + Utils.bytesToHex(topicUUID) + " partitionId=" + partitionId);
+    LOG.debug("getRecords topicUUID={} partitionId={}", Utils.bytesToHex(topicUUID), partitionId);
     String topicName = Metadata.getInstance().findTopicName(topicUUID);
     if (topicName != null) {
       TopicPartitionFile file = new TopicPartitionFile(topicName, partitionId);

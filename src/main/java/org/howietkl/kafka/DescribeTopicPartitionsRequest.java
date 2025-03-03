@@ -1,5 +1,8 @@
 package org.howietkl.kafka;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
@@ -7,20 +10,21 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class DescribeTopicPartitionsRequest extends Request {
+  public static final Logger LOG = LoggerFactory.getLogger(DescribeTopicPartitionsRequest.class);
   public List<String> topicNames = new ArrayList<>();
 
   @Override
   public void parseRequest(ByteBuffer src) throws IOException {
-    System.out.println("parsing org.howietkl.kafka.DescribeTopicPartitionsRequest");
+    super.parseRequest(src);
     parseCompactArrayTopicNames(src);
   }
 
   void parseCompactArrayTopicNames(ByteBuffer src) throws IOException {
     int arraySize = Utils.getUnsignedVarInt(src) - 1;
-    System.out.println(" numTopics=" + arraySize);
     for (int i = 0; i < arraySize; i++) {
       topicNames.add(parseCompactStringTopicName(src));
     }
+    LOG.debug("topics={}", topicNames.toString());
   }
 
   private String parseCompactStringTopicName(ByteBuffer src) throws IOException {
@@ -28,7 +32,6 @@ public class DescribeTopicPartitionsRequest extends Request {
     byte[] topicNameBytes = new byte[topicNameSize];
     src.get(topicNameBytes);
     String topicName = new String(topicNameBytes, StandardCharsets.UTF_8);
-    System.out.println(" request topic=" + topicName);
     src.get(); // tag buffer
     return topicName;
   }
