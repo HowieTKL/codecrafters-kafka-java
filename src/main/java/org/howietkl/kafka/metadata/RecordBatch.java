@@ -2,7 +2,7 @@ package org.howietkl.kafka.metadata;
 
 import java.util.List;
 
-class RecordBatch {
+public class RecordBatch {
   byte[] baseOffset = new byte[8]; // 8 bytes
   byte[] batchLength = new byte[4]; // 4
   byte[] partitionLeaderEpoch = new byte[4]; // 4

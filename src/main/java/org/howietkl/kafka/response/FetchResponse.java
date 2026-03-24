@@ -31,7 +31,7 @@ public class FetchResponse extends Response<FetchRequest> {
       if (partitions.isEmpty()) {
         out.write((byte) 2); // partitions=1
         out.write(new byte[]{0, 0, 0, 0}); // partition index
-        out.write(ERR_UNKNOWN_TOPIC);
+        out.write(hasTopic(topicUUID) ? ERR_NONE : ERR_UNKNOWN_TOPIC);
         out.write(new byte[]{0, 0, 0, 0, 0, 0, 0, 0}); // high watermark
         out.write(new byte[]{0, 0, 0, 0, 0, 0, 0, 0}); // last_stable_offset
         out.write(new byte[]{0, 0, 0, 0, 0, 0, 0, 0}); // log_start_offset
@@ -45,8 +45,7 @@ public class FetchResponse extends Response<FetchRequest> {
         Utils.putUnsignedVarInt(out, partitions.size() + 1);
         for (Integer partitionId : partitions) {
           out.write(ByteBuffer.allocate(4).putInt(partitionId).array());
-          List<byte[]> records = getRecords(topicUUID, partitionId);
-          out.write(records.isEmpty() ? ERR_UNKNOWN_TOPIC : ERR_NONE);
+          out.write(hasTopic(topicUUID) ? ERR_NONE : ERR_UNKNOWN_TOPIC);
           out.write(new byte[]{0, 0, 0, 0, 0, 0, 0, 0}); // high watermark
           out.write(new byte[]{0, 0, 0, 0, 0, 0, 0, 0}); // last_stable_offset
           out.write(new byte[]{0, 0, 0, 0, 0, 0, 0, 0}); // log_start_offset
@@ -54,7 +53,8 @@ public class FetchResponse extends Response<FetchRequest> {
           // resPayload.write(new byte[]{0, 0, 0, 0, 0, 0, 0, 0}); // aborted producer id
           // resPayload.write(new byte[]{0, 0, 0, 0, 0, 0, 0, 0}); // aborted first offset
           out.write(new byte[]{0, 0, 0, 0}); // preferred read replica
-          Utils.putUnsignedVarInt(out, records.size() + 1);
+          List<byte[]> records = getRecords(topicUUID, partitionId);
+          Utils.putUnsignedVarInt(out, records.isEmpty() ? 0 : records.getFirst().length + 1);
           for (byte[] record : records) {
             out.write(record);
           }
@@ -66,6 +66,10 @@ public class FetchResponse extends Response<FetchRequest> {
     out.write((byte) 0); // tag buffer
   }
 
+  private boolean hasTopic(byte[] topicUUID) {
+    return Metadata.getInstance().findTopicName(topicUUID) != null;
+  }
+
   private static List<byte[]> getRecords(byte[] topicUUID, int partitionId) throws IOException {
     LOG.info("getRecords topicUUID={} partitionId={}", Utils.bytesToHex(topicUUID), partitionId);
     String topicName = Metadata.getInstance().findTopicName(topicUUID);
@@ -73,7 +77,7 @@ public class FetchResponse extends Response<FetchRequest> {
       TopicPartitionFile file = new TopicPartitionFile(topicName, partitionId);
       return file.getRecords();
     } else {
-      return Collections.EMPTY_LIST;
+      return Collections.emptyList();
     }
   }
 

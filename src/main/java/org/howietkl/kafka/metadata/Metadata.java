@@ -13,7 +13,7 @@ import java.util.*;
 // https://binspec.org/kafka-cluster-metadata
 public class Metadata {
   public static final String KAFKA_CLUSTER_METADATA_LOG_PATH = "/tmp/kraft-combined-logs/__cluster_metadata-0/00000000000000000000.log";
-  public static final Logger LOG = LoggerFactory.getLogger(Metadata.class);
+  private static final Logger LOG = LoggerFactory.getLogger(Metadata.class);
 
   private static final Metadata instance = new Metadata();
   private static final List<RecordBatch> recordBatches = new ArrayList<>();
