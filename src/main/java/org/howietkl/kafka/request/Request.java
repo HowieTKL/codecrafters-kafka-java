@@ -9,6 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public abstract class Request {
+  public static final short API_KEY_PRODUCE = 0;
   public static final short API_KEY_FETCH = 1;
   public static final short API_KEY_API_VERSIONS = 18;
   public static final short API_KEY_DESCRIBE_TOPIC_PARTITIONS = 75;
@@ -39,6 +40,8 @@ public abstract class Request {
       request = new DescribeTopicPartitionsRequest();
     } else if (requestApiKey == API_KEY_FETCH) {
       request = new FetchRequest();
+    } else if (requestApiKey == API_KEY_PRODUCE) {
+      request = new ProduceRequest();
     } else {
       LOG.error("Unsupported request api key={}", requestApiKey);
       throw new UnsupportedOperationException("Unsupported request api key=" + requestApiKey);
