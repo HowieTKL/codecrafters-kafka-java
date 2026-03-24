@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 public class DescribeTopicPartitionsRequest extends Request {
@@ -25,6 +26,7 @@ public class DescribeTopicPartitionsRequest extends Request {
     for (int i = 0; i < arraySize; i++) {
       topicNames.add(parseCompactStringTopicName(src));
     }
+    topicNames.sort(Comparator.naturalOrder());
     LOG.debug("topics={}", topicNames.toString());
   }
 
